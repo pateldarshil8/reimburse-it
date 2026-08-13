@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  employee
+  reviewer
+}
+
+enum RequestStatus {
+  draft
+  submitted
+  approved
+  rejected
+  completed
+}
+
+enum ReviewActionType {
+  approved
+  rejected
+  completed
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  expenseRequests ExpenseRequest[] @relation("SubmitterRequests")
+  reviewActions   ReviewAction[]   @relation("ReviewerActions")
+
+  @@map("users")
+}
+
+model ExpenseRequest {
+  id           String        @id @default(cuid())
+  submitterId  String        @map("submitter_id")
+  title        String
+  category     String
+  totalAmount  Decimal       @map("total_amount") @db.Decimal(10, 2)
+  currency     String        @default("USD")
+  receiptUrl   String?       @map("receipt_url")
+  status       RequestStatus @default(draft)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  submitter     User           @relation("SubmitterRequests", fields: [submitterId], references: [id])
+  reviewActions ReviewAction[]
+
+  @@map("expense_requests")
+}
+
+model ReviewAction {
+  id         String           @id @default(cuid())
+  requestId  String           @map("request_id")
+  reviewerId String           @map("reviewer_id")
+  action     ReviewActionType
+  comment    String
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  request  ExpenseRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  reviewer User           @relation("ReviewerActions", fields: [reviewerId], references: [id])
+
+  @@map("review_actions")
+}
