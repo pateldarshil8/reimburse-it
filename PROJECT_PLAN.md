@@ -55,5 +55,6 @@ short README with setup steps and seeded logins.
 - [x] Prisma schema defined (User, ExpenseRequest, ReviewAction)
 - [x] Auth.js credentials provider + role-gated routing (`/employee`, `/reviewer`) via `src/proxy.ts`
 - [x] Seed script for 3 test users
-- [ ] Push schema to a live Neon database (needs `DATABASE_URL` — see README)
-- [ ] Deploy empty shell to Vercel
+- [x] Pushed schema to a live Supabase database, 3 users seeded
+- [x] Deployed to Vercel, auto-deploys on push to `main`
+- [x] Verified live: login, role-gated routing, and DB round-trip all confirmed working

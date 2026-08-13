@@ -9,24 +9,29 @@ reimbursement requests; reviewers approve, reject, or complete them.
 
 - **Frontend + backend:** Next.js (App Router, TypeScript) — API routes double as the backend
 - **Styling:** Tailwind CSS + shadcn/ui (components hand-added, see `src/components/ui`)
-- **ORM:** Prisma
-- **Database:** PostgreSQL via Neon (or Supabase)
+- **ORM:** Prisma 7 (`prisma-client` generator + `@prisma/adapter-pg` driver adapter — Prisma 7
+  no longer reads `DATABASE_URL` from the schema file; see `prisma.config.ts` and `src/lib/prisma.ts`)
+- **Database:** PostgreSQL via Supabase
 - **Auth:** Auth.js (Credentials provider), roles: `employee` / `reviewer`
-- **Deployment:** Vercel
+- **Deployment:** Vercel (auto-deploys on push to `main`)
+
+## Live deployment
+
+https://reimburse-it-pateldarshil8s-projects.vercel.app
 
 ## Setup
 
-1. Install dependencies:
+1. Install dependencies (this also runs `prisma generate` via `postinstall`):
    ```bash
    npm install
    ```
 2. Copy `.env.example` to `.env` and fill in:
-   - `DATABASE_URL` / `DIRECT_URL` — your Neon (or Supabase) Postgres connection strings
+   - `DATABASE_URL` — pooled Supabase connection string (port 6543, `?pgbouncer=true`), used by the app at runtime
+   - `DIRECT_URL` — direct Supabase connection string (port 5432), used by the CLI for `db push` (falls back to `DATABASE_URL` if unset)
    - `AUTH_SECRET` — generate with `npx auth secret`
-3. Push the schema and generate the client:
+3. Push the schema (client is regenerated automatically as part of `npm run build`, or run it directly):
    ```bash
    npm run db:push
-   npm run db:generate
    ```
 4. Seed test users:
    ```bash
@@ -64,8 +69,8 @@ All seeded accounts use the password `password123`.
 ## Note on this environment
 
 This project was scaffolded in a network-restricted sandbox that could not reach
-`binaries.prisma.sh`, so the Prisma client could not be generated here and the
-build could not be fully type-checked locally. Everything else (Next.js compile,
-Tailwind, routing, auth config) built successfully. Run `npm run db:generate`
-(or `npm install`, which triggers it automatically) on a machine with normal
-network access, or let Vercel's build do it, before your first real build.
+`binaries.prisma.sh`, so `prisma generate` could never be verified locally there —
+Vercel's build (which has normal network access) was used as the real test
+environment instead, and the deployment above is confirmed working end-to-end
+(login, role-gated routing, DB round-trip). Locally, `npm install` triggers
+`prisma generate` automatically via `postinstall`.
