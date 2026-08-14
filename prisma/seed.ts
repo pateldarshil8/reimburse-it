@@ -63,6 +63,13 @@ async function main() {
   // demonstrating an *invalid* amount is intentionally NOT seeded here --
   // that scenario is meant to be triggered live through the app's own
   // validation (see docs/testing.md), not persisted as bad data.
+  //
+  // receiptUrl values below are Supabase Storage object *paths* (matching
+  // the real upload model), not actual uploaded files -- no bytes exist at
+  // these paths in the bucket. The UI resolves receipts to signed URLs at
+  // view time and falls back to "Not available" if the object doesn't
+  // exist, so these demo rows render correctly without needing real
+  // uploaded receipts.
 
   const existingRequests = await prisma.expenseRequest.count();
   if (existingRequests > 0) {
@@ -81,7 +88,7 @@ async function main() {
       expenseDate: new Date("2026-08-05"),
       totalAmount: "84.50",
       currency: "USD",
-      receiptUrl: "https://example.com/receipts/office-supplies.pdf",
+      receiptUrl: "seed/office-supplies-receipt.pdf",
       receiptName: "office-supplies-receipt.pdf",
       receiptType: "application/pdf",
       status: "submitted",
@@ -120,7 +127,7 @@ async function main() {
       expenseDate: new Date("2026-07-28"),
       totalAmount: "199.00",
       currency: "USD",
-      receiptUrl: "https://example.com/receipts/training.pdf",
+      receiptUrl: "seed/training-receipt.pdf",
       receiptName: "training-receipt.pdf",
       receiptType: "application/pdf",
       status: "approved",
@@ -162,7 +169,7 @@ async function main() {
       expenseDate: new Date("2026-08-01"),
       totalAmount: "310.00",
       currency: "USD",
-      receiptUrl: "https://example.com/receipts/team-lunch.jpg",
+      receiptUrl: "seed/team-lunch-receipt.jpg",
       receiptName: "team-lunch-receipt.jpg",
       receiptType: "image/jpeg",
       status: "rejected",
@@ -204,7 +211,7 @@ async function main() {
       expenseDate: new Date("2026-07-15"),
       totalAmount: "52.99",
       currency: "USD",
-      receiptUrl: "https://example.com/receipts/software.pdf",
+      receiptUrl: "seed/software-receipt.pdf",
       receiptName: "software-receipt.pdf",
       receiptType: "application/pdf",
       status: "paid",
