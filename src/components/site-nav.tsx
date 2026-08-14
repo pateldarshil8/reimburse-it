@@ -3,9 +3,16 @@ import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+const NAV_LINKS: Record<string, { href: string; label: string }> = {
+  employee: { href: "/employee", label: "My requests" },
+  reviewer: { href: "/reviewer", label: "Review queue" },
+  admin: { href: "/admin", label: "Admin" },
+};
+
 export async function SiteNav() {
   const session = await auth();
   const role = session?.user?.role;
+  const link = role ? NAV_LINKS[role] : undefined;
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -14,18 +21,11 @@ export async function SiteNav() {
           <Link href="/" className="text-sm font-semibold">
             ReimburseIt
           </Link>
-          {role && (
+          {link && (
             <nav className="flex items-center gap-4 text-sm text-neutral-600">
-              {role === "employee" && (
-                <Link href="/employee" className="hover:text-neutral-900">
-                  My requests
-                </Link>
-              )}
-              {role === "reviewer" && (
-                <Link href="/reviewer" className="hover:text-neutral-900">
-                  Review queue
-                </Link>
-              )}
+              <Link href={link.href} className="hover:text-neutral-900">
+                {link.label}
+              </Link>
             </nav>
           )}
         </div>

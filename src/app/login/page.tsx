@@ -49,7 +49,7 @@ export default function LoginPage() {
             </Button>
           </form>
           <p className="mt-4 text-xs text-neutral-500">
-            Seeded logins: employee@cdf.org / reviewer@cdf.org, password:
+            Seeded logins: employee@cdf.org / reviewer@cdf.org / admin@cdf.org, password:
             password123
           </p>
         </CardContent>

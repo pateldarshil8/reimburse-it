@@ -1,5 +1,26 @@
 import type { NextAuthConfig } from "next-auth";
 
+export type AppRole = "employee" | "reviewer" | "admin";
+
+const ROLE_HOME: Record<AppRole, string> = {
+  employee: "/employee",
+  reviewer: "/reviewer",
+  admin: "/admin",
+};
+
+const ROLE_PREFIXES: Record<AppRole, string> = {
+  employee: "/employee",
+  reviewer: "/reviewer",
+  admin: "/admin",
+};
+
+function roleForPath(pathname: string): AppRole | null {
+  for (const role of Object.keys(ROLE_PREFIXES) as AppRole[]) {
+    if (pathname.startsWith(ROLE_PREFIXES[role])) return role;
+  }
+  return null;
+}
+
 export const authConfig = {
   pages: {
     signIn: "/login",
@@ -7,39 +28,38 @@ export const authConfig = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role: string }).role;
+        token.role = (user as { role: AppRole }).role;
         token.id = (user as { id: string }).id;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role as "employee" | "reviewer";
+        session.user.role = token.role as AppRole;
         session.user.id = token.id as string;
       }
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const role = auth?.user?.role;
+      const role = auth?.user?.role as AppRole | undefined;
 
-      const isOnEmployee = nextUrl.pathname.startsWith("/employee");
-      const isOnReviewer = nextUrl.pathname.startsWith("/reviewer");
+      const requiredRole = roleForPath(nextUrl.pathname);
 
-      if (isOnEmployee || isOnReviewer) {
+      if (requiredRole) {
         if (!isLoggedIn) return false;
-        if (isOnReviewer && role !== "reviewer") {
-          return Response.redirect(new URL("/employee", nextUrl));
-        }
-        if (isOnEmployee && role !== "employee") {
-          return Response.redirect(new URL("/reviewer", nextUrl));
+        if (role !== requiredRole) {
+          return Response.redirect(
+            new URL(role ? ROLE_HOME[role] : "/login", nextUrl)
+          );
         }
         return true;
       }
 
       if (isLoggedIn && nextUrl.pathname === "/login") {
-        const dest = role === "reviewer" ? "/reviewer" : "/employee";
-        return Response.redirect(new URL(dest, nextUrl));
+        return Response.redirect(
+          new URL(role ? ROLE_HOME[role] : "/employee", nextUrl)
+        );
       }
 
       return true;

@@ -43,3 +43,7 @@ next-env.d.ts
 
 # prisma generated client
 /src/generated/prisma
+
+# next dev auto-generated agent rule files (not part of project structure)
+/AGENTS.md
+/CLAUDE.md

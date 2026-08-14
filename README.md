@@ -1,23 +1,58 @@
 # ReimburseIt
 
-Expense reimbursement tracker for Community Dreams Foundation. Employees submit
-reimbursement requests; reviewers approve, reject, or complete them.
+**Live URL:** https://reimburse-it-pateldarshil8s-projects.vercel.app
 
-3-day hackathon build. See `PROJECT_PLAN.md` for the day-by-day plan and scope cuts.
+Expense reimbursement tracker built for the CDF SDE Hackathon. Employees submit
+reimbursement requests; reviewers approve, reject, or mark them paid; admins manage
+user roles and account status.
 
-## Stack
+Personal 3-day compressed build (the official brief runs 5 days). See
+`PROJECT_PLAN.md` for the day-by-day plan, scope decisions, and the gap analysis
+against the official `problem_statement.md` / `README.md` (CDF-provided) requirements,
+and `planning/planning.md` for the plan as written before coding began.
 
-- **Frontend + backend:** Next.js (App Router, TypeScript) — API routes double as the backend
-- **Styling:** Tailwind CSS + shadcn/ui (components hand-added, see `src/components/ui`)
-- **ORM:** Prisma 7 (`prisma-client` generator + `@prisma/adapter-pg` driver adapter — Prisma 7
-  no longer reads `DATABASE_URL` from the schema file; see `prisma.config.ts` and `src/lib/prisma.ts`)
+## Problem overview
+
+Small organizations often track reimbursements through email, chat, paper receipts,
+and spreadsheets, which makes it hard to answer three questions: what's been
+submitted, what state is it in, and who needs to act next. ReimburseIt replaces that
+with one workflow:
+
+**Create → Submit → Review → Approve / Reject → Paid**
+
+## Features implemented
+
+_This section is updated as the build progresses through Day 2 and Day 3 — see
+`PROJECT_PLAN.md` for what's done vs. still in progress._
+
+- [x] Role-based accounts and routing: `employee`, `reviewer`, `admin`
+- [x] Credentials-based auth (Auth.js), backend-enforced role checks
+- [x] Data model covering requests, review actions/history, notifications, and
+      admin/account audit history
+- [x] Private Supabase Storage bucket provisioned for receipt files
+- [ ] Requester: create/submit a reimbursement request with a real receipt upload
+- [ ] Reviewer: queue, search/filter, approve/reject with reason, mark Paid
+- [ ] Dashboard financial totals
+- [ ] Admin: view/manage users and account status
+- [ ] In-app notifications
+- [ ] Server-side pagination on request/notification lists
+
+## Tech stack
+
+- **Frontend + backend:** Next.js 16 (App Router, TypeScript) — Server Components,
+  Server Actions, and Route Handlers under `src/app` act as the backend
+- **Styling:** Tailwind CSS + a hand-built shadcn/ui-style component library
+  (`src/components/ui`)
+- **ORM:** Prisma 7 (`prisma-client` generator + `@prisma/adapter-pg` driver adapter —
+  Prisma 7 no longer reads `DATABASE_URL` from the schema file; see
+  `prisma.config.ts` and `src/lib/prisma.ts`)
 - **Database:** PostgreSQL via Supabase
-- **Auth:** Auth.js (Credentials provider), roles: `employee` / `reviewer`
+- **File storage:** Supabase Storage, private bucket, signed URLs for receipt access
+- **Auth:** Auth.js (Credentials provider), JWT sessions, roles: `employee` /
+  `reviewer` / `admin`
 - **Deployment:** Vercel (auto-deploys on push to `main`)
 
-## Live deployment
-
-https://reimburse-it-pateldarshil8s-projects.vercel.app
+See `docs/architecture.md` for the full data-flow and API design explanation.
 
 ## Setup
 
@@ -29,11 +64,12 @@ https://reimburse-it-pateldarshil8s-projects.vercel.app
    - `DATABASE_URL` — pooled Supabase connection string (port 6543, `?pgbouncer=true`), used by the app at runtime
    - `DIRECT_URL` — direct Supabase connection string (port 5432), used by the CLI for `db push` (falls back to `DATABASE_URL` if unset)
    - `AUTH_SECRET` — generate with `npx auth secret`
+   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — from Supabase Project Settings → API; the service role key is server-only, never expose it to the client
 3. Push the schema (client is regenerated automatically as part of `npm run build`, or run it directly):
    ```bash
    npm run db:push
    ```
-4. Seed test users:
+4. Seed demonstration data:
    ```bash
    npm run db:seed
    ```
@@ -42,7 +78,13 @@ https://reimburse-it-pateldarshil8s-projects.vercel.app
    npm run dev
    ```
 
-## Seeded logins
+## Run instructions
+
+Once running (locally at `http://localhost:3000`, or via the live URL above), log in
+with one of the seeded accounts below. Each role is redirected to its own area
+(`/employee`, `/reviewer`, `/admin`) and route access is enforced server-side.
+
+## Demo credentials
 
 All seeded accounts use the password `password123`.
 
@@ -51,26 +93,48 @@ All seeded accounts use the password `password123`.
 | employee | employee@cdf.org   |
 | employee | employee2@cdf.org  |
 | reviewer | reviewer@cdf.org   |
+| admin    | admin@cdf.org      |
 
 ## Data model
 
-- **User** — id, name, email, passwordHash, role, createdAt
-- **ExpenseRequest** — id, submitterId, title, category, totalAmount, currency, status, createdAt, updatedAt
-  - Status flow: `draft → submitted → approved | rejected → completed`
-- **ReviewAction** (audit trail) — id, requestId, reviewerId, action, comment, createdAt
+- **User** — id, name, email, passwordHash, role (`employee`/`reviewer`/`admin`),
+  accountStatus (`active`/`inactive`), createdAt
+- **ExpenseRequest** — id, submitterId, title, category, expenseDate, description,
+  totalAmount, currency, receipt file reference (name/type/storage path), status,
+  createdAt, updatedAt
+  - Status flow: `draft → submitted → approved | rejected → paid`
+- **ReviewAction** (audit trail) — id, requestId, reviewerId, action, comment,
+  previousStatus, newStatus, createdAt
+- **Notification** — id, userId, requestId, message, readAt, createdAt
+- **UserAudit** — id, targetId, actorId, action, detail, createdAt (admin role/account
+  status changes)
 
-## Scope cuts
+Full schema: `prisma/schema.prisma`.
+
+## Known limitations
+
+_To be finalized on Day 3 once the build is complete — tracked live as scope decisions
+in `PROJECT_PLAN.md`. As of the Day 1 foundation:_
 
 - No line-item breakdown — single `totalAmount` field per request
-- No real file storage — receipt is a text/URL field, not an upload
-- Minimal auth — Credentials provider, no password reset/email verification
-- No admin UI — users are seeded via `npm run db:seed`, not managed in-app
+- Minimal auth — Credentials provider, no password reset/email verification (matches
+  the brief's own "preconfigured demonstration accounts" guidance)
+- Admin functionality is scoped to a minimal view/role-assignment/activation screen,
+  not full account-status history in the UI
+- No full OpenAPI/Swagger spec — API shape for the paginated list endpoints is
+  documented in `docs/architecture.md` instead
+
+## Future improvements
+
+- Automated test coverage beyond the manual pass in `docs/testing.md`
+- Email notifications alongside in-app notifications
+- CSV/PDF export of requests
+- Multiple approval levels / budget-limit warnings
 
 ## Note on this environment
 
 This project was scaffolded in a network-restricted sandbox that could not reach
 `binaries.prisma.sh`, so `prisma generate` could never be verified locally there —
 Vercel's build (which has normal network access) was used as the real test
-environment instead, and the deployment above is confirmed working end-to-end
-(login, role-gated routing, DB round-trip). Locally, `npm install` triggers
-`prisma generate` automatically via `postinstall`.
+environment instead. Locally, `npm install` triggers `prisma generate` automatically
+via `postinstall`.
