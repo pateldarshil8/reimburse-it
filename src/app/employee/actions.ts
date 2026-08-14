@@ -82,7 +82,7 @@ export async function saveExpenseRequest(
     };
   }
 
-  const status = intent === "submit" ? "submitted" : "draft";
+  const status: "draft" | "submitted" = intent === "submit" ? "submitted" : "draft";
 
   const data = {
     submitterId: session.user.id,
