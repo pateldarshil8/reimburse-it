@@ -30,12 +30,21 @@ _This section is updated as the build progresses through Day 2 and Day 3 — see
 - [x] Data model covering requests, review actions/history, notifications, and
       admin/account audit history
 - [x] Private Supabase Storage bucket provisioned for receipt files
-- [ ] Requester: create/submit a reimbursement request with a real receipt upload
-- [ ] Reviewer: queue, search/filter, approve/reject with reason, mark Paid
-- [ ] Dashboard financial totals
+- [x] Requester: create/edit/submit a reimbursement request, with a "receipt required
+      to submit" rule enforced server-side (real file upload wired up, pending the
+      `SUPABASE_SERVICE_ROLE_KEY` value -- see `docs/testing.md`)
+- [x] Requester: own request list with status badges, detail/history view, signed-URL
+      receipt access
+- [x] Reviewer: queue with search/filter (status, category, requester, date, keyword),
+      sort, and pagination
+- [x] Reviewer: approve / reject (required reason) / mark Paid, with backend RBAC
+      (can't act on your own request, drafts are never visible to reviewers)
+- [x] Dashboard financial totals (pending count, total pending/requested/approved/paid)
+- [x] `GET /api/requests`: real paginated/filterable/sortable API endpoint
+- [x] Notifications are written on every status transition (approve/reject/paid) --
+      no UI to view them yet, that's Day 3
 - [ ] Admin: view/manage users and account status
-- [ ] In-app notifications
-- [ ] Server-side pagination on request/notification lists
+- [ ] In-app notifications UI (list, mark-as-read)
 
 ## Tech stack
 
@@ -114,15 +123,19 @@ Full schema: `prisma/schema.prisma`.
 ## Known limitations
 
 _To be finalized on Day 3 once the build is complete — tracked live as scope decisions
-in `PROJECT_PLAN.md`. As of the Day 1 foundation:_
+in `PROJECT_PLAN.md`. As of Day 2:_
 
+- Real receipt upload requires `SUPABASE_SERVICE_ROLE_KEY` to be set (locally and in
+  Vercel); until then, submitting with a new file fails gracefully with an error
+  rather than silently succeeding -- see `docs/testing.md`.
 - No line-item breakdown — single `totalAmount` field per request
 - Minimal auth — Credentials provider, no password reset/email verification (matches
   the brief's own "preconfigured demonstration accounts" guidance)
 - Admin functionality is scoped to a minimal view/role-assignment/activation screen,
   not full account-status history in the UI
-- No full OpenAPI/Swagger spec — API shape for the paginated list endpoints is
+- No full OpenAPI/Swagger spec — API shape for the paginated list endpoint is
   documented in `docs/architecture.md` instead
+- No resubmission-after-rejection flow (Tier 2 stretch, not built)
 
 ## Future improvements
 

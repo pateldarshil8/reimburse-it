@@ -113,6 +113,41 @@ This is still the heart of the grading criteria (30% core functionality) — don
 to make room for the new items above; if something has to slip, it should be the
 Notification UI or admin screen, not this.
 
+### Day 2 status
+
+- [x] Shared validation (zod schemas, categories, receipt-file checks) and a shared
+      `listRequests` / `computeDashboardTotals` query layer, used by both roles and by
+      `GET /api/requests`
+- [x] Submitter: create/edit/submit a request, save-as-draft vs. submit-for-review via
+      one form, receipt required to submit (validated and confirmed live), own request
+      list with status badges, detail/history view with signed-URL receipt access
+- [x] Reviewer: queue with search/filter (status/category/requester/date/keyword),
+      sort, pagination; request detail page; approve / reject (required reason) / mark
+      paid, each backend-checked (role, not-your-own-request, valid status transition)
+- [x] Reviewer dashboard totals: pending count, total pending/requested/approved/paid
+      -- confirmed accurate against seed data and after a live approve+pay transition
+- [x] `GET /api/requests`: real endpoint, backend auth (401 unauthenticated / 403 wrong
+      role), employee scope can't be widened by a client-supplied `requesterId`
+- [x] Drafts are excluded from the reviewer queue at the query level, not just hidden
+      in the UI (verified live: the seeded draft never appeared under any filter)
+- [x] Notifications are written on every transition (submit/approve/reject/paid) --
+      table populated, no UI yet (Day 3)
+- [x] `accountStatus` now enforced at login (deactivated users can't sign in)
+- [x] Build fixed and verified on Vercel (one TS fix needed: an object-literal status
+      field was widening to `string` instead of the Prisma enum; fixed with an explicit
+      type annotation)
+- [x] Live smoke test via browser automation against the production deployment and
+      real Supabase data: login/logout and role redirects, draft edit forms
+      pre-filling correctly, missing-receipt validation, full approve → mark-paid
+      lifecycle with history and dashboard totals updating correctly. See
+      `docs/testing.md` for the full pass and what's still outstanding (reject flow,
+      real file upload, and a few filter combinations weren't yet clicked through live).
+- [ ] **Blocking gap:** `SUPABASE_SERVICE_ROLE_KEY` is still not set (locally or in
+      Vercel), so real receipt file uploads can't be tested end-to-end yet -- upload
+      failures are handled gracefully (form shows an error, the request itself still
+      saves), but this needs to be resolved before Day 3's "receipt upload" demo-script
+      item can be shown working for real.
+
 **Day 3 — Completion, admin, docs, polish, deploy.**
 
 - Add `paid` status (reviewer marks an approved request as Paid — UI label, see data
