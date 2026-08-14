@@ -45,12 +45,15 @@ bottom).
       `/employee`; visiting `/login` again while still authenticated redirected
       straight back to `/employee` rather than showing the form; signing out and back
       in as `reviewer@cdf.org` landed on `/reviewer` with the reviewer nav/badge.
-- [ ] Valid reimbursement submission **with a real receipt file** -- `SUPABASE_URL` and
-      `SUPABASE_SERVICE_ROLE_KEY` are now set locally and in Vercel, and the app has
-      been redeployed with them. The receipt-*required* validation is confirmed (see
-      above); the successful-upload path itself still needs one manual click-through,
-      since this environment's browser automation can't attach a file to a file input
-      (a hard restriction, not a bug in the app) -- see the note below.
+- [x] **Valid reimbursement submission with a real receipt file.** Manually verified
+      by Darshil (this environment's browser automation can't attach files to a file
+      input, so this one step was done by hand rather than scripted): attached a
+      generated PDF receipt to the "Regional volunteer summit travel" draft as
+      `employee@cdf.org` and submitted it. The request moved out of Draft and appeared
+      in the reviewer queue as `reviewer@cdf.org`, correctly showing the Approve/Reject
+      actions for a `submitted` request -- confirming the upload, the storage write,
+      and the draft-to-submitted transition all worked end-to-end against the real
+      Supabase Storage bucket.
 - [ ] Invalid amount (zero / negative) -- covered by `ExpenseRequestFormSchema` (zod,
       `positive()`), not yet exercised live.
 - [ ] Invalid / missing category -- covered by `z.enum(CATEGORIES)`, not yet exercised
@@ -86,13 +89,9 @@ bottom).
 
 `src/lib/supabase-storage.ts` requires `SUPABASE_URL` and
 `SUPABASE_SERVICE_ROLE_KEY` to actually write to the private `receipts` bucket. Both
-are now set in `.env` (local) and in Vercel's project environment variables, and the
-production deployment has been rebuilt since. What remains is a single manual
-end-to-end check -- log in as an employee, attach a real file to the "Regional
-volunteer summit travel" draft, and submit -- since this project's browser-automation
-tooling can attach files to inputs from a connected folder but not from this session's
-own scratch space, and the OPT project folder isn't the right place to leave a
-temporary test file in.
+are set in `.env` (local) and in Vercel's project environment variables, and the
+production deployment was rebuilt after adding them. Confirmed working end-to-end (see
+the checked item above) -- this is no longer an open item.
 
 ## Approach
 

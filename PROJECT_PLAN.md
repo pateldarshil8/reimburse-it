@@ -140,13 +140,16 @@ Notification UI or admin screen, not this.
       real Supabase data: login/logout and role redirects, draft edit forms
       pre-filling correctly, missing-receipt validation, full approve → mark-paid
       lifecycle with history and dashboard totals updating correctly. See
-      `docs/testing.md` for the full pass and what's still outstanding (reject flow,
-      real file upload, and a few filter combinations weren't yet clicked through live).
-- [ ] **Blocking gap:** `SUPABASE_SERVICE_ROLE_KEY` is still not set (locally or in
-      Vercel), so real receipt file uploads can't be tested end-to-end yet -- upload
-      failures are handled gracefully (form shows an error, the request itself still
-      saves), but this needs to be resolved before Day 3's "receipt upload" demo-script
-      item can be shown working for real.
+      `docs/testing.md` for the full pass and what's still outstanding (reject flow
+      and a few filter combinations weren't yet clicked through live).
+- [x] `SUPABASE_SERVICE_ROLE_KEY` set locally and in Vercel, app redeployed. Real
+      receipt upload confirmed end-to-end: Darshil attached a generated PDF to the
+      "Regional volunteer summit travel" draft and submitted it as `employee@cdf.org`;
+      it correctly appeared in the reviewer queue as a `submitted` request with
+      Approve/Reject actions. (The upload click itself was done manually -- this
+      session's browser automation can attach files from a connected folder in theory
+      but was blocked from doing so here, so this was the one Day 2 step not fully
+      scripted end-to-end.)
 
 **Day 3 — Completion, admin, docs, polish, deploy.**
 
