@@ -166,8 +166,16 @@ Day 1 redo, after the official CDF documents arrived (this pass):
       `get_advisors` (no security warnings)
 - [x] `planning/planning.md`, `problem_statement.md`, `docs/*.md` added to match the
       official repo structure
-- [ ] Full local build/Vercel/Supabase/repo-structure verification — final step of
-      this pass, see task list
+- [x] Full local build/Vercel/Supabase/repo-structure verification: Vercel production
+      deployment READY on the new commit, Supabase tables match the new schema (4
+      users / 5 requests / 8 review actions / 4 notifications, RLS on, no security
+      warnings), local `OPT` folder and GitHub repo both match the CDF README's
+      expected structure (`README.md`, `problem_statement.md`, `planning/planning.md`,
+      `src/`, `docs/{architecture,testing,reflection,walkthrough}.md`)
+
+**Day 1 is complete as of this pass.** Day 2 starts with the core workflow build
+(create/submit/review/approve/reject, real receipt upload, dashboard totals,
+search/filter/pagination) per the Day 2 plan above.
 
 ## Gap analysis vs. the official CDF problem statement
 
