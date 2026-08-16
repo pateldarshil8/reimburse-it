@@ -41,7 +41,13 @@ export function UserRow({ id, name, email, role, accountStatus, createdAt, isSel
           <Badge variant="secondary">{role}</Badge>
         ) : (
           <form action={roleAction} className="flex flex-col gap-1">
+            {/* key={role} forces React to remount this uncontrolled <select>
+                (and drop its stale defaultValue) whenever the server-fetched
+                role changes after a successful update -- otherwise the
+                dropdown keeps showing whatever the admin last picked in the
+                UI even after the save round-trip completes. */}
             <select
+              key={role}
               name="role"
               defaultValue={role}
               className="flex h-8 w-32 rounded-md border border-neutral-300 bg-white px-2 text-sm shadow-sm"
