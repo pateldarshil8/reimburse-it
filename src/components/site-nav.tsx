@@ -19,19 +19,23 @@ export async function SiteNav() {
     : 0;
 
   return (
-    <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+    <header className="sticky top-0 z-10 border-b border-neutral-800 bg-black/80 backdrop-blur supports-[backdrop-filter]:bg-black/60">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-semibold text-neutral-900 transition-colors hover:text-indigo-600"
+            className="flex items-center gap-2 text-sm font-semibold text-neutral-50 transition-colors hover:text-cyan-300"
           >
-            <span className="inline-block size-2 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span
+              className="inline-block size-2 rounded-full bg-cyan-400"
+              style={{ boxShadow: "0 0 8px 1px rgba(34,211,238,0.7)" }}
+              aria-hidden="true"
+            />
             ReimburseIt
           </Link>
           {link && (
-            <nav className="flex items-center gap-4 text-sm text-neutral-600">
-              <Link href={link.href} className="transition-colors hover:text-indigo-600">
+            <nav className="flex items-center gap-4 text-sm text-neutral-400">
+              <Link href={link.href} className="transition-colors hover:text-cyan-300">
                 {link.label}
               </Link>
             </nav>
@@ -42,7 +46,7 @@ export async function SiteNav() {
             <>
               <Link
                 href="/notifications"
-                className="relative text-sm text-neutral-600 transition-colors hover:text-indigo-600"
+                className="relative text-sm text-neutral-400 transition-colors hover:text-cyan-300"
               >
                 Notifications
                 {unreadCount > 0 && (
@@ -52,7 +56,7 @@ export async function SiteNav() {
                 )}
               </Link>
               <Badge variant="secondary">{session.user.role}</Badge>
-              <span className="hidden text-sm text-neutral-600 sm:inline">
+              <span className="hidden text-sm text-neutral-400 sm:inline">
                 {session.user.name}
               </span>
               <form

@@ -26,8 +26,8 @@ export default async function EmployeeRequestDetailPage({
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Edit draft request</h1>
-          <p className="text-sm text-neutral-500">
+          <h1 className="text-2xl font-semibold text-neutral-50">Edit draft request</h1>
+          <p className="text-sm text-neutral-400">
             Update the details, then save as a draft or submit for review.
           </p>
         </div>
@@ -49,8 +49,8 @@ export default async function EmployeeRequestDetailPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">{request.title}</h1>
-          <p className="text-sm text-neutral-500">
+          <h1 className="text-2xl font-semibold text-neutral-50">{request.title}</h1>
+          <p className="text-sm text-neutral-400">
             {request.category} &middot; submitted {formatDate(request.createdAt)}
           </p>
         </div>
@@ -65,17 +65,17 @@ export default async function EmployeeRequestDetailPage({
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
               <p className="text-neutral-500">Amount</p>
-              <p className="font-medium">
+              <p className="font-medium text-neutral-100">
                 {formatCurrency(request.totalAmount.toString(), request.currency)}
               </p>
             </div>
             <div>
               <p className="text-neutral-500">Expense date</p>
-              <p className="font-medium">{formatDate(request.expenseDate)}</p>
+              <p className="font-medium text-neutral-100">{formatDate(request.expenseDate)}</p>
             </div>
             <div>
               <p className="text-neutral-500">Category</p>
-              <p className="font-medium">{request.category}</p>
+              <p className="font-medium text-neutral-100">{request.category}</p>
             </div>
             <div>
               <p className="text-neutral-500">Receipt</p>
@@ -84,12 +84,12 @@ export default async function EmployeeRequestDetailPage({
                   href={receiptSignedUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
+                  className="font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
                 >
                   View receipt
                 </a>
               ) : (
-                <p className="font-medium text-neutral-400">Not available</p>
+                <p className="font-medium text-neutral-600">Not available</p>
               )}
             </div>
           </div>

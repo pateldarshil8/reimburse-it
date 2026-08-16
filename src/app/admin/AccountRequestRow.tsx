@@ -31,9 +31,9 @@ export function AccountRequestRow({ id, firstName, lastName, email, createdAt }:
   );
 
   return (
-    <tr className="border-b border-neutral-200 last:border-0">
+    <tr className="border-b border-neutral-800 last:border-0">
       <td className="py-3 pr-4 align-top">
-        <p className="font-medium">
+        <p className="font-medium text-neutral-100">
           {firstName} {lastName}
         </p>
         <p className="text-xs text-neutral-500">{email}</p>
@@ -59,8 +59,8 @@ export function AccountRequestRow({ id, firstName, lastName, email, createdAt }:
             </Button>
           </form>
         </div>
-        {approveState.error && <p className="mt-1 text-xs text-red-600">{approveState.error}</p>}
-        {rejectState.error && <p className="mt-1 text-xs text-red-600">{rejectState.error}</p>}
+        {approveState.error && <p className="mt-1 text-xs text-red-400">{approveState.error}</p>}
+        {rejectState.error && <p className="mt-1 text-xs text-red-400">{rejectState.error}</p>}
       </td>
     </tr>
   );

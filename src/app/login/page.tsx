@@ -20,11 +20,18 @@ export default function LoginPage() {
 
   return (
     <main className="flex flex-1 items-center justify-center p-6 animate-fade-in">
-      <Card className="w-full max-w-sm">
+      <Card
+        className="w-full max-w-sm"
+        style={{ boxShadow: "0 0 40px -12px rgba(34,211,238,0.15)" }}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <span className="inline-block size-2 rounded-full bg-indigo-600" aria-hidden="true" />
-            ReimburseIt
+            <span
+              className="inline-block size-2 rounded-full bg-cyan-400"
+              style={{ boxShadow: "0 0 8px 1px rgba(34,211,238,0.7)" }}
+              aria-hidden="true"
+            />
+            Sign in
           </CardTitle>
           <CardDescription>
             Community Dreams Foundation expense tracker. Sign in to continue.
@@ -47,7 +54,7 @@ export default function LoginPage() {
               <Input id="password" name="password" type="password" required />
             </div>
             {state?.error && (
-              <p className="text-sm text-red-600" role="alert">
+              <p className="text-sm text-red-400" role="alert">
                 {state.error}
               </p>
             )}
@@ -56,9 +63,9 @@ export default function LoginPage() {
               {pending ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-neutral-500">
+          <p className="mt-4 text-center text-sm text-neutral-400">
             New here?{" "}
-            <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">
+            <Link href="/signup" className="font-medium text-cyan-400 hover:text-cyan-300 hover:underline">
               Create account
             </Link>
           </p>

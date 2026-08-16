@@ -19,26 +19,26 @@ const ACTION_LABEL: Record<string, string> = {
 
 export function ReviewHistory({ actions }: { actions: ReviewActionEntry[] }) {
   if (actions.length === 0) {
-    return <p className="text-sm text-neutral-500">No history yet.</p>;
+    return <p className="text-sm text-neutral-400">No history yet.</p>;
   }
 
   return (
     <ol className="flex flex-col gap-4">
       {actions.map((entry) => (
-        <li key={entry.id} className="border-l-2 border-indigo-100 pl-4">
+        <li key={entry.id} className="border-l-2 border-cyan-500/20 pl-4">
           <div className="flex flex-wrap items-baseline gap-x-2 text-sm">
-            <span className="font-medium">
+            <span className="font-medium text-neutral-100">
               {ACTION_LABEL[entry.action] ?? entry.action}
             </span>
-            <span className="text-neutral-400">
+            <span className="text-neutral-500">
               by {entry.reviewer?.name ?? "the requester"}
             </span>
-            <span className="text-neutral-400">
+            <span className="text-neutral-500">
               &middot; {formatDateTime(entry.createdAt)}
             </span>
           </div>
           {entry.comment && (
-            <p className="mt-1 text-sm text-neutral-600">&ldquo;{entry.comment}&rdquo;</p>
+            <p className="mt-1 text-sm text-neutral-400">&ldquo;{entry.comment}&rdquo;</p>
           )}
         </li>
       ))}

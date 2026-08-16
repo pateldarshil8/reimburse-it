@@ -45,13 +45,13 @@ export default async function AdminDashboard({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Admin</h1>
-        <p className="text-sm text-neutral-500">
+        <h1 className="text-2xl font-semibold text-neutral-50">Admin</h1>
+        <p className="text-sm text-neutral-400">
           Manage user accounts, roles, and new account requests.
         </p>
       </div>
 
-      <div className="flex gap-1 border-b border-neutral-200">
+      <div className="flex gap-1 border-b border-neutral-800">
         {TABS.map((t) => {
           const active = t.key === tab;
           const count = t.key === "requests" ? pendingRequests.length : users.length;
@@ -61,8 +61,8 @@ export default async function AdminDashboard({
               href={t.key === "users" ? "/admin" : "/admin?tab=requests"}
               className={`relative -mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors duration-150 ${
                 active
-                  ? "border-indigo-600 text-indigo-600"
-                  : "border-transparent text-neutral-500 hover:text-indigo-600"
+                  ? "border-cyan-400 text-cyan-400"
+                  : "border-transparent text-neutral-500 hover:text-cyan-300"
               }`}
             >
               {t.label}
@@ -82,7 +82,7 @@ export default async function AdminDashboard({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-neutral-200 text-xs uppercase text-neutral-500">
+                    <tr className="border-b border-neutral-800 text-xs uppercase text-neutral-500">
                       <th className="py-2 pr-4 font-medium">User</th>
                       <th className="py-2 pr-4 font-medium">Role</th>
                       <th className="py-2 pr-4 font-medium">Status</th>
@@ -114,17 +114,17 @@ export default async function AdminDashboard({
             </CardHeader>
             <CardContent>
               {recentAudits.length === 0 ? (
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-neutral-400">
                   No role or account-status changes yet.
                 </p>
               ) : (
                 <ul className="flex flex-col gap-2 text-sm">
                   {recentAudits.map((a) => (
-                    <li key={a.id} className="border-b border-neutral-100 pb-2 last:border-0">
+                    <li key={a.id} className="border-b border-neutral-800 pb-2 last:border-0">
                       <span className="text-neutral-500">{formatDateTime(a.createdAt)}</span>{" "}
-                      <span className="font-medium">{a.actor.name}</span>{" "}
+                      <span className="font-medium text-neutral-100">{a.actor.name}</span>{" "}
                       {a.action.replace("_", " ")}{" "}
-                      <span className="font-medium">{a.target.name}</span>
+                      <span className="font-medium text-neutral-100">{a.target.name}</span>
                       {a.detail ? <span className="text-neutral-500"> ({a.detail})</span> : null}
                     </li>
                   ))}
@@ -140,7 +140,7 @@ export default async function AdminDashboard({
           </CardHeader>
           <CardContent>
             {pendingRequests.length === 0 ? (
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-neutral-400">
                 No pending signup requests.
                 {reviewedRequestsCount > 0 &&
                   ` ${reviewedRequestsCount} request${reviewedRequestsCount === 1 ? "" : "s"} reviewed previously.`}
@@ -149,7 +149,7 @@ export default async function AdminDashboard({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-neutral-200 text-xs uppercase text-neutral-500">
+                    <tr className="border-b border-neutral-800 text-xs uppercase text-neutral-500">
                       <th className="py-2 pr-4 font-medium">Requester</th>
                       <th className="py-2 font-medium">Actions</th>
                     </tr>

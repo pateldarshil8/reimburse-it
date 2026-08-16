@@ -18,7 +18,7 @@ import {
 
 const initialState: SignupState = {};
 
-const STRENGTH_BAR_COLORS = ["bg-red-500", "bg-orange-500", "bg-yellow-400", "bg-green-600"];
+const STRENGTH_BAR_COLORS = ["bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-400"];
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(submitAccountRequest, initialState);
@@ -27,18 +27,21 @@ export function SignupForm() {
 
   if (state.success) {
     return (
-      <Card className="w-full max-w-sm animate-fade-in">
+      <Card
+        className="w-full max-w-sm animate-fade-in"
+        style={{ boxShadow: "0 0 40px -12px rgba(34,211,238,0.15)" }}
+      >
         <CardHeader>
           <CardTitle>Request sent</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
+          <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-4 text-sm text-cyan-200">
             Account creation request has been sent to the admin. Your account
             will be activated once it&apos;s accepted.
           </div>
           <Link
             href="/login"
-            className="text-center text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
+            className="text-center text-sm font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
           >
             Back to sign in
           </Link>
@@ -48,10 +51,17 @@ export function SignupForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card
+      className="w-full max-w-sm"
+      style={{ boxShadow: "0 0 40px -12px rgba(34,211,238,0.15)" }}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="inline-block size-2 rounded-full bg-indigo-600" aria-hidden="true" />
+          <span
+            className="inline-block size-2 rounded-full bg-cyan-400"
+            style={{ boxShadow: "0 0 8px 1px rgba(34,211,238,0.7)" }}
+            aria-hidden="true"
+          />
           Create account
         </CardTitle>
         <CardDescription>
@@ -66,14 +76,14 @@ export function SignupForm() {
               <Label htmlFor="firstName">Name</Label>
               <Input id="firstName" name="firstName" placeholder="Jane" required maxLength={100} />
               {state.fieldErrors?.firstName && (
-                <p className="text-xs text-red-600">{state.fieldErrors.firstName}</p>
+                <p className="text-xs text-red-400">{state.fieldErrors.firstName}</p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="lastName">Surname</Label>
               <Input id="lastName" name="lastName" placeholder="Doe" required maxLength={100} />
               {state.fieldErrors?.lastName && (
-                <p className="text-xs text-red-600">{state.fieldErrors.lastName}</p>
+                <p className="text-xs text-red-400">{state.fieldErrors.lastName}</p>
               )}
             </div>
           </div>
@@ -82,7 +92,7 @@ export function SignupForm() {
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" placeholder="you@example.com" required />
             {state.fieldErrors?.email && (
-              <p className="text-xs text-red-600">{state.fieldErrors.email}</p>
+              <p className="text-xs text-red-400">{state.fieldErrors.email}</p>
             )}
           </div>
 
@@ -105,37 +115,37 @@ export function SignupForm() {
                       className={`flex-1 rounded-full transition-colors duration-300 ${
                         i < strength.score
                           ? STRENGTH_BAR_COLORS[strength.score - 1]
-                          : "bg-neutral-200"
+                          : "bg-neutral-800"
                       }`}
                     />
                   ))}
                 </div>
-                <p className="text-xs text-neutral-500">
-                  Strength: <span className="font-medium">{strength.label}</span>
+                <p className="text-xs text-neutral-400">
+                  Strength: <span className="font-medium text-neutral-200">{strength.label}</span>
                 </p>
                 <ul className="mt-1 grid grid-cols-1 gap-0.5 text-xs sm:grid-cols-2">
-                  <li className={`transition-colors duration-200 ${strength.checks.length ? "text-green-600" : "text-neutral-400"}`}>
+                  <li className={`transition-colors duration-200 ${strength.checks.length ? "text-green-400" : "text-neutral-600"}`}>
                     {strength.checks.length ? "✓" : "•"} At least 8 characters
                   </li>
-                  <li className={`transition-colors duration-200 ${strength.checks.case ? "text-green-600" : "text-neutral-400"}`}>
+                  <li className={`transition-colors duration-200 ${strength.checks.case ? "text-green-400" : "text-neutral-600"}`}>
                     {strength.checks.case ? "✓" : "•"} Upper &amp; lowercase letters
                   </li>
-                  <li className={`transition-colors duration-200 ${strength.checks.number ? "text-green-600" : "text-neutral-400"}`}>
+                  <li className={`transition-colors duration-200 ${strength.checks.number ? "text-green-400" : "text-neutral-600"}`}>
                     {strength.checks.number ? "✓" : "•"} At least one number
                   </li>
-                  <li className={`transition-colors duration-200 ${strength.checks.special ? "text-green-600" : "text-neutral-400"}`}>
+                  <li className={`transition-colors duration-200 ${strength.checks.special ? "text-green-400" : "text-neutral-600"}`}>
                     {strength.checks.special ? "✓" : "•"} A special character
                   </li>
                 </ul>
               </div>
             )}
             {state.fieldErrors?.password && (
-              <p className="text-xs text-red-600">{state.fieldErrors.password}</p>
+              <p className="text-xs text-red-400">{state.fieldErrors.password}</p>
             )}
           </div>
 
           {state.error && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-red-400" role="alert">
               {state.error}
             </p>
           )}
@@ -146,9 +156,9 @@ export function SignupForm() {
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-neutral-500">
+        <p className="mt-4 text-center text-sm text-neutral-400">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">
+          <Link href="/login" className="font-medium text-cyan-400 hover:text-cyan-300 hover:underline">
             Sign in
           </Link>
         </p>

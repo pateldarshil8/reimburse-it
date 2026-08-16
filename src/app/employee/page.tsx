@@ -25,8 +25,8 @@ export default async function EmployeeDashboard({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">My requests</h1>
-          <p className="text-sm text-neutral-500">
+          <h1 className="text-2xl font-semibold text-neutral-50">My requests</h1>
+          <p className="text-sm text-neutral-400">
             Create and track your reimbursement requests.
           </p>
         </div>
@@ -37,9 +37,9 @@ export default async function EmployeeDashboard({
 
       {data.length === 0 ? (
         <Card>
-          <CardContent className="py-10 text-center text-sm text-neutral-500">
+          <CardContent className="py-10 text-center text-sm text-neutral-400">
             You haven&apos;t created any requests yet.{" "}
-            <Link href="/employee/new" className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">
+            <Link href="/employee/new" className="font-medium text-cyan-400 hover:text-cyan-300 hover:underline">
               Create your first one
             </Link>
             .
@@ -49,16 +49,16 @@ export default async function EmployeeDashboard({
         <div className="flex flex-col gap-3">
           {data.map((request) => (
             <Link key={request.id} href={`/employee/${request.id}`}>
-              <Card className="hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+              <Card className="hover:-translate-y-0.5 hover:border-cyan-500/40 hover:shadow-[0_0_20px_-6px_rgba(34,211,238,0.25)]">
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
-                    <p className="font-medium">{request.title}</p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="font-medium text-neutral-100">{request.title}</p>
+                    <p className="text-sm text-neutral-400">
                       {request.category} &middot; {formatDate(request.expenseDate)}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="font-medium">
+                    <p className="font-medium text-neutral-100">
                       {formatCurrency(request.totalAmount.toString(), request.currency)}
                     </p>
                     <StatusBadge status={request.status} />

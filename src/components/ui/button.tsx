@@ -4,20 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
   {
     variants: {
       variant: {
         default:
-          "bg-indigo-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-md",
+          "bg-cyan-500 text-neutral-950 shadow-[0_0_0_1px_rgba(34,211,238,0.4)] hover:-translate-y-0.5 hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.35)]",
         destructive:
-          "bg-red-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md",
+          "bg-red-500 text-white shadow-sm hover:-translate-y-0.5 hover:bg-red-400 hover:shadow-[0_0_16px_rgba(239,68,68,0.3)]",
         outline:
-          "border border-neutral-300 bg-white hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-sm",
+          "border border-neutral-700 bg-transparent text-neutral-200 hover:-translate-y-0.5 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:text-cyan-300",
         secondary:
-          "bg-neutral-100 text-neutral-900 hover:-translate-y-0.5 hover:bg-neutral-200",
-        ghost: "hover:bg-indigo-50 hover:text-indigo-700",
-        link: "text-indigo-600 underline-offset-4 hover:underline hover:text-indigo-700",
+          "bg-neutral-800 text-neutral-100 hover:-translate-y-0.5 hover:bg-neutral-700",
+        ghost: "text-neutral-200 hover:bg-cyan-500/10 hover:text-cyan-300",
+        link: "text-cyan-400 underline-offset-4 hover:underline hover:text-cyan-300",
       },
       size: {
         default: "h-9 px-4 py-2",

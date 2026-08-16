@@ -12,6 +12,9 @@ import { Label } from "@/components/ui/label";
 
 const STATUS_OPTIONS = ["submitted", "approved", "rejected", "paid"] as const;
 
+const SELECT_CLASS =
+  "flex h-9 w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 text-sm text-neutral-100 shadow-sm transition-colors duration-150 hover:border-neutral-600 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30";
+
 type SearchParams = {
   q?: string;
   status?: string;
@@ -63,8 +66,8 @@ export default async function ReviewerQueuePage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold">Review queue</h1>
-        <p className="text-sm text-neutral-500">
+        <h1 className="text-2xl font-semibold text-neutral-50">Review queue</h1>
+        <p className="text-sm text-neutral-400">
           Approve, reject, or mark submitted requests as paid.
         </p>
       </div>
@@ -89,12 +92,7 @@ export default async function ReviewerQueuePage({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="status">Status</Label>
-              <select
-                id="status"
-                name="status"
-                defaultValue={sp.status ?? ""}
-                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
-              >
+              <select id="status" name="status" defaultValue={sp.status ?? ""} className={SELECT_CLASS}>
                 <option value="">All (except drafts)</option>
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
@@ -105,12 +103,7 @@ export default async function ReviewerQueuePage({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="category">Category</Label>
-              <select
-                id="category"
-                name="category"
-                defaultValue={sp.category ?? ""}
-                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
-              >
+              <select id="category" name="category" defaultValue={sp.category ?? ""} className={SELECT_CLASS}>
                 <option value="">All categories</option>
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -121,12 +114,7 @@ export default async function ReviewerQueuePage({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="requesterId">Requester</Label>
-              <select
-                id="requesterId"
-                name="requesterId"
-                defaultValue={sp.requesterId ?? ""}
-                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
-              >
+              <select id="requesterId" name="requesterId" defaultValue={sp.requesterId ?? ""} className={SELECT_CLASS}>
                 <option value="">All requesters</option>
                 {employees.map((e) => (
                   <option key={e.id} value={e.id}>
@@ -137,12 +125,7 @@ export default async function ReviewerQueuePage({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="sort">Sort</Label>
-              <select
-                id="sort"
-                name="sort"
-                defaultValue={sp.sort ?? "newest"}
-                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
-              >
+              <select id="sort" name="sort" defaultValue={sp.sort ?? "newest"} className={SELECT_CLASS}>
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
                 <option value="amount_desc">Amount: high to low</option>
@@ -169,7 +152,7 @@ export default async function ReviewerQueuePage({
 
       {data.length === 0 ? (
         <Card>
-          <CardContent className="py-10 text-center text-sm text-neutral-500">
+          <CardContent className="py-10 text-center text-sm text-neutral-400">
             No requests match these filters.
           </CardContent>
         </Card>
@@ -177,17 +160,17 @@ export default async function ReviewerQueuePage({
         <div className="flex flex-col gap-3">
           {data.map((request) => (
             <Link key={request.id} href={`/reviewer/${request.id}`}>
-              <Card className="hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+              <Card className="hover:-translate-y-0.5 hover:border-cyan-500/40 hover:shadow-[0_0_20px_-6px_rgba(34,211,238,0.25)]">
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
-                    <p className="font-medium">{request.title}</p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="font-medium text-neutral-100">{request.title}</p>
+                    <p className="text-sm text-neutral-400">
                       {request.submitter.name} &middot; {request.category} &middot;{" "}
                       {formatDate(request.expenseDate)}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="font-medium">
+                    <p className="font-medium text-neutral-100">
                       {formatCurrency(request.totalAmount.toString(), request.currency)}
                     </p>
                     <StatusBadge status={request.status} />
@@ -213,8 +196,8 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
   return (
     <Card>
       <CardContent className="py-4">
-        <p className="text-xs text-neutral-500">{label}</p>
-        <p className="text-lg font-semibold">{value}</p>
+        <p className="text-xs text-neutral-400">{label}</p>
+        <p className="text-lg font-semibold text-neutral-50">{value}</p>
       </CardContent>
     </Card>
   );
