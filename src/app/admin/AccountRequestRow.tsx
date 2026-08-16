@@ -1,0 +1,64 @@
+"use client";
+
+import { useActionState } from "react";
+import {
+  approveAccountRequest,
+  rejectAccountRequest,
+  type AdminActionState,
+} from "./actions";
+import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format";
+
+const initialState: AdminActionState = {};
+
+type Props = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: Date;
+};
+
+export function AccountRequestRow({ id, firstName, lastName, email, createdAt }: Props) {
+  const [approveState, approveAction, approvePending] = useActionState(
+    approveAccountRequest.bind(null, id),
+    initialState
+  );
+  const [rejectState, rejectAction, rejectPending] = useActionState(
+    rejectAccountRequest.bind(null, id),
+    initialState
+  );
+
+  return (
+    <tr className="border-b border-neutral-200 last:border-0">
+      <td className="py-3 pr-4 align-top">
+        <p className="font-medium">
+          {firstName} {lastName}
+        </p>
+        <p className="text-xs text-neutral-500">{email}</p>
+        <p className="text-xs text-neutral-400">Requested {formatDateTime(createdAt)}</p>
+      </td>
+      <td className="py-3 align-top">
+        <div className="flex flex-wrap gap-2">
+          <form action={approveAction}>
+            <Button type="submit" size="sm" disabled={approvePending || rejectPending}>
+              {approvePending ? "Accepting..." : "Accept"}
+            </Button>
+          </form>
+          <form action={rejectAction}>
+            <Button
+              type="submit"
+              size="sm"
+              variant="destructive"
+              disabled={approvePending || rejectPending}
+            >
+              {rejectPending ? "Rejecting..." : "Reject"}
+            </Button>
+          </form>
+        </div>
+        {approveState.error && <p className="mt-1 text-xs text-red-600">{approveState.error}</p>}
+        {rejectState.error && <p className="mt-1 text-xs text-red-600">{rejectState.error}</p>}
+      </td>
+    </tr>
+  );
+}
