@@ -178,6 +178,53 @@ pass regardless — it's required, and cheap) → `paid` status (last resort; a 
 two-state review flow beats a broken three-state one, but this is now the *last* thing
 to cut, not the first, since §8's "total paid" and the demo script both depend on it).
 
+### Day 3 status
+
+Nothing from the fallback order above ended up needing to be cut -- notifications UI
+and the admin screen both shipped in full.
+
+- [x] `paid` status: already live since Day 2 (schema enum + mark-paid action); no
+      further work needed here.
+- [x] Admin screen: user list (email, role, status, join date), role change and
+      activate/deactivate actions, both backend-guarded (`requireAdmin()`) and written
+      inside a transaction alongside a `UserAudit` row; an admin can't demote or
+      deactivate themselves; a "Recent account activity" panel renders the audit
+      trail. Live-tested against production -- caught and fixed a real bug in the
+      process (role `<select>` showing a stale value after a successful update; see
+      `docs/testing.md` and `docs/reflection.md`).
+- [x] Notifications UI: list view, unread-count badge in the nav, mark single / mark
+      all as read, plus a documented `GET /api/notifications` endpoint alongside the
+      Server Component read path. Live-tested end-to-end: rejecting a request as a
+      reviewer produced a real unread notification for the requester, correctly linked
+      back to the request.
+- [x] Validation/security audit against §4 and §18: found and fixed one real gap
+      (receipt file-type validation only checked the client-declared MIME type, not
+      the actual file bytes) by adding backend magic-byte sniffing
+      (`src/lib/file-signature.ts`). Reviewed and confirmed already covered: duplicate
+      submission (state-machine + disabled-while-pending button), invalid workflow
+      transitions (status checks on every transition), 401/403 responses on the API
+      routes, no stack traces or DB errors surfaced to the client.
+- [x] Responsive pass: reviewed every page against §12 -- request lists already used
+      card layouts rather than rigid tables, filter forms already collapsed to a
+      single column below `sm`, and the admin table used `overflow-x-auto`. Found and
+      fixed one real risk: the site nav could overflow on a narrow screen with
+      notifications/role badge/name/sign-out all in one unwrapped row; made it wrap
+      and hid the display name below `sm`.
+- [x] Dashboard financial summary: complete since Day 2, re-verified accurate during
+      Day 3 live testing across multiple approve/reject/pay transitions.
+- [x] Required docs finalized: `docs/architecture.md`, `docs/testing.md`,
+      `docs/reflection.md`, `docs/walkthrough.md` (video link still to be added),
+      README features/limitations/future-improvements sections.
+- [x] Full end-to-end pass as all three roles against the live Vercel deployment,
+      including cross-role RBAC checks (employee blocked from `/admin` and
+      `/reviewer`, admin blocked from `/reviewer`, both redirected server-side rather
+      than shown an error page). See `docs/testing.md` for the complete pass.
+- [x] Final commit/push to `pateldarshil8/reimburse-it`, verified against a real
+      Vercel deployment (READY, no build errors) after every commit.
+
+**Day 3 is complete as of this pass. All three days of the compressed personal plan
+are now done.**
+
 ## Day 1 status
 
 Original Day 1 build:
