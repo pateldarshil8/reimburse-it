@@ -1,7 +1,8 @@
 # Architecture
 
-Status: living document, first drafted after Day 1 (foundation), to be extended through
-Day 2 and Day 3 as the workflow, storage, and admin features are built.
+Status: complete as of Day 3 (final day). First drafted after Day 1 (foundation),
+extended through Day 2 (core workflow, receipts, dashboard) and Day 3 (admin,
+notifications, security hardening).
 
 ## Overview
 
@@ -157,9 +158,33 @@ are Server Actions rather than a conventional REST API surface.
   are set as Vercel environment variables, never committed. `.env.example` documents
   every variable a fresh clone needs without containing real values.
 
-## What's still to build (as of Day 1 redo)
+## Admin and notifications (Day 3)
 
-This document will be updated as Day 2 (core workflow, receipts, dashboard, search/
-filter/pagination) and Day 3 (paid status, admin screen, notifications UI, validation
-hardening, docs/polish) land. See `PROJECT_PLAN.md` for the day-by-day breakdown and
-`planning/planning.md` for the original pre-code plan this was built against.
+Admin functionality (`src/app/admin/`) follows the same guard pattern as the reviewer
+actions: a `requireAdmin()` helper throws if the caller is unauthenticated or not an
+admin, checked at the top of every mutating Server Action, independent of what the UI
+exposes. Role changes and account activation/deactivation are written inside a
+`prisma.$transaction([...])` alongside a `UserAudit` row, the same pattern
+`ReviewAction` uses for request status transitions -- one consistent
+mutation-plus-audit-row shape across both request review and account administration.
+An admin is explicitly blocked (server-side) from changing their own role or
+deactivating their own account, to avoid a no-admins-left state with no recovery path.
+
+Notifications are written as a side effect of every status transition (inside the same
+transaction as the transition itself, so a notification never exists without the
+transition that caused it). The UI (`src/app/notifications/`) and the
+`GET /api/notifications` Route Handler both read from the same `listNotifications`/
+`unreadNotificationCount` helpers in `src/lib/notifications.ts`, scoped to the
+authenticated caller's own `userId` -- there is no way to request another user's
+notifications through either path.
+
+## Known gaps and disclosed limitations
+
+See `docs/reflection.md` for the full list with reasoning. In short: no automated test
+suite (the sandbox this project was built in can't run `prisma generate` locally,
+which made a fast local test loop impractical), no resubmission-after-rejection flow,
+and no full OpenAPI spec (the two Route Handlers' shapes are documented in this file
+instead, since most reads go through Server Components rather than a REST layer).
+
+See `PROJECT_PLAN.md` for the day-by-day build log and `planning/planning.md` for the
+original pre-code plan this was built against.

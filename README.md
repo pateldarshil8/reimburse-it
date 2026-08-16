@@ -1,6 +1,6 @@
 # ReimburseIt
 
-**Live URL:** https://reimburse-it-pateldarshil8s-projects.vercel.app
+**Live URL:** https://reimburse-it-nine.vercel.app
 
 Expense reimbursement tracker built for the CDF SDE Hackathon. Employees submit
 reimbursement requests; reviewers approve, reject, or mark them paid; admins manage
@@ -22,17 +22,15 @@ with one workflow:
 
 ## Features implemented
 
-_This section is updated as the build progresses through Day 2 and Day 3 — see
-`PROJECT_PLAN.md` for what's done vs. still in progress._
-
-- [x] Role-based accounts and routing: `employee`, `reviewer`, `admin`
+- [x] Role-based accounts and routing: `employee`, `reviewer`, `admin`, enforced
+      server-side (route middleware + per-action checks), not just hidden nav links
 - [x] Credentials-based auth (Auth.js), backend-enforced role checks
 - [x] Data model covering requests, review actions/history, notifications, and
       admin/account audit history
-- [x] Private Supabase Storage bucket provisioned for receipt files
 - [x] Requester: create/edit/submit a reimbursement request, with a "receipt required
-      to submit" rule enforced server-side (real file upload wired up, pending the
-      `SUPABASE_SERVICE_ROLE_KEY` value -- see `docs/testing.md`)
+      to submit" rule enforced server-side, real file upload to a private Supabase
+      Storage bucket, backend-validated against the actual uploaded bytes (not just
+      the filename extension or the client-declared content type)
 - [x] Requester: own request list with status badges, detail/history view, signed-URL
       receipt access
 - [x] Reviewer: queue with search/filter (status, category, requester, date, keyword),
@@ -40,11 +38,15 @@ _This section is updated as the build progresses through Day 2 and Day 3 — see
 - [x] Reviewer: approve / reject (required reason) / mark Paid, with backend RBAC
       (can't act on your own request, drafts are never visible to reviewers)
 - [x] Dashboard financial totals (pending count, total pending/requested/approved/paid)
-- [x] `GET /api/requests`: real paginated/filterable/sortable API endpoint
-- [x] Notifications are written on every status transition (approve/reject/paid) --
-      no UI to view them yet, that's Day 3
-- [ ] Admin: view/manage users and account status
-- [ ] In-app notifications UI (list, mark-as-read)
+- [x] Admin: view users (email, role, status, join date), change roles,
+      activate/deactivate accounts, with every change recorded in an audit trail and
+      shown in a "Recent account activity" panel; an admin can't demote or deactivate
+      themselves
+- [x] Notifications: written on every status transition, in-app list with unread-count
+      badge, mark single / mark all as read
+- [x] `GET /api/requests` and `GET /api/notifications`: real paginated/filterable/
+      sortable API endpoints, consistent response shape, 401/403/500 handled without
+      leaking internal error detail
 
 ## Tech stack
 
@@ -122,32 +124,37 @@ Full schema: `prisma/schema.prisma`.
 
 ## Known limitations
 
-_To be finalized on Day 3 once the build is complete — tracked live as scope decisions
-in `PROJECT_PLAN.md`. As of Day 2:_
-
-- Real receipt upload requires `SUPABASE_SERVICE_ROLE_KEY` to be set (locally and in
-  Vercel); until then, submitting with a new file fails gracefully with an error
-  rather than silently succeeding -- see `docs/testing.md`.
-- No line-item breakdown — single `totalAmount` field per request
+- No automated test suite -- `prisma generate` cannot run in the sandboxed
+  environment this project was developed in, which made a local test-and-iterate
+  loop impractical within the available time. Verification instead relied on a
+  thorough manual pass against the live deployment; see `docs/testing.md` for exactly
+  what was and wasn't exercised.
+- No resubmission-after-rejection flow -- a rejected request is currently terminal
+  (Tier 2 stretch, not built).
+- No line-item breakdown — single `totalAmount` field per request.
 - Minimal auth — Credentials provider, no password reset/email verification (matches
-  the brief's own "preconfigured demonstration accounts" guidance)
-- Admin functionality is scoped to a minimal view/role-assignment/activation screen,
-  not full account-status history in the UI
-- No full OpenAPI/Swagger spec — API shape for the paginated list endpoint is
-  documented in `docs/architecture.md` instead
-- No resubmission-after-rejection flow (Tier 2 stretch, not built)
+  the brief's own "preconfigured demonstration accounts" guidance).
+- No full OpenAPI/Swagger spec — the two Route Handlers' request/response shape is
+  documented in `docs/architecture.md` instead of a generated spec, since most of the
+  app's reads go through Server Components rather than a client-side fetch layer.
+- Duplicate-submission prevention relies on UI-level pending-disable plus a
+  state-machine check (a request can only leave `draft` once); not hardened against a
+  true concurrent multi-tab race with row-level locking.
 
 ## Future improvements
 
-- Automated test coverage beyond the manual pass in `docs/testing.md`
+- Automated test coverage (unit tests for validation/RBAC logic at minimum)
+- Resubmission after rejection
 - Email notifications alongside in-app notifications
 - CSV/PDF export of requests
 - Multiple approval levels / budget-limit warnings
+- Generated OpenAPI spec once the API surface grows
 
 ## Note on this environment
 
-This project was scaffolded in a network-restricted sandbox that could not reach
-`binaries.prisma.sh`, so `prisma generate` could never be verified locally there —
-Vercel's build (which has normal network access) was used as the real test
-environment instead. Locally, `npm install` triggers `prisma generate` automatically
-via `postinstall`.
+This project was scaffolded and built in a network-restricted sandbox that could not
+reach `binaries.prisma.sh`, so `prisma generate` could never be verified locally there
+— Vercel's build (which has normal network access) was used as the real test
+environment throughout, and every commit in this repository's history was verified
+against a real Vercel deployment before being treated as done. Locally, `npm install`
+triggers `prisma generate` automatically via `postinstall`.

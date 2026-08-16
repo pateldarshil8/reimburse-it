@@ -1,103 +1,175 @@
 # Testing
 
-Status: first real manual pass completed on Day 2, against the live Vercel deployment
-and the production Supabase database, using the seeded demonstration accounts. Day 3
-will extend this pass to cover the admin screen, notifications UI, and the remaining
-unchecked scenarios below once receipt upload is fully wired up (see note at the
-bottom).
+Status: complete as of Day 3 (final day). Manual passes were performed directly
+against the live Vercel deployment (`reimburse-it-nine.vercel.app`) and the
+production Supabase database, using the seeded demonstration accounts, across
+Day 2 and Day 3. No local dev server was used for verification -- see the note
+at the bottom on why.
 
 ## Manual test scenarios (per the official brief)
 
-- [x] **Missing receipt blocks submission.** Opened the seeded draft "Regional
-      volunteer summit travel" (no receipt attached) as `employee@cdf.org`, clicked
-      "Submit for review" with no file chosen. Result: blocked with a field-level error
-      ("A receipt is required to submit.") and a form-level error, request correctly
-      stayed in `draft`. Matches problem_statement.md's required "missing receipt"
-      scenario.
-- [x] **Draft edit form loads existing data correctly.** The same draft's edit form
-      pre-filled title, category (via the Radix select), expense date, amount, and
+- [x] **Missing receipt blocks submission.** Opened a draft with no receipt
+      attached as `employee@cdf.org`, clicked "Submit for review" with no file
+      chosen. Result: blocked with a field-level error ("A receipt is required
+      to submit.") and a form-level error; request correctly stayed in
+      `draft`.
+- [x] **Draft edit form loads existing data correctly.** A draft's edit form
+      correctly pre-filled title, category, expense date, amount, and
       description from the database on load.
-- [x] **Reviewer dashboard totals are accurate.** Compared the queue's summary cards
-      against the seed data by hand: Pending 1 / $84.50, Total requested $646.49, Total
-      approved $251.99, Total paid $52.99 -- all matched before any actions were taken.
-- [x] **Drafts are never visible to reviewers.** The seeded draft did not appear in the
-      reviewer queue under any filter, confirming the backend-enforced exclusion in
-      `listRequests` (not just a missing UI link).
-- [x] **Reviewer approval.** Approved "Printer paper and toner" (`$84.50`, submitted)
-      as `reviewer@cdf.org` with a comment. Status flipped to `Approved`, the approve/
-      reject form was replaced by the "Mark as paid" form, and the comment appeared in
-      the request's history immediately.
-- [x] **Approved request marked as Paid.** Marked the same request as paid with a
-      payment note. Status flipped to `Paid`, all action forms disappeared (terminal
-      state), and the full three-entry history (submitted / approved / paid) rendered
-      in order with the correct actor and timestamp on each entry.
-- [x] **Dashboard totals update after a transition.** After the approve + pay actions
-      above, Pending dropped to 0, Total pending to $0.00, Total approved rose to
-      $336.49, and Total paid rose to $137.49 -- each figure hand-verified against the
-      new status mix.
-- [x] **Receipt fallback for demo data.** Seed rows reference storage paths with no
-      real uploaded bytes; both the employee and reviewer detail pages correctly show
-      "Not available" instead of erroring when the signed URL can't be generated.
-- [x] **Filter state reflected in the URL.** Navigating directly to `/reviewer?status=
-      submitted` pre-selected "Submitted" in the filter form and correctly scoped the
-      list -- confirms filters are shareable/bookmarkable, not just client state.
-- [x] **Session-based role routing.** Logging in as `employee@cdf.org` landed on
-      `/employee`; visiting `/login` again while still authenticated redirected
-      straight back to `/employee` rather than showing the form; signing out and back
-      in as `reviewer@cdf.org` landed on `/reviewer` with the reviewer nav/badge.
-- [x] **Valid reimbursement submission with a real receipt file.** Manually verified
-      by Darshil (this environment's browser automation can't attach files to a file
-      input, so this one step was done by hand rather than scripted): attached a
-      generated PDF receipt to the "Regional volunteer summit travel" draft as
-      `employee@cdf.org` and submitted it. The request moved out of Draft and appeared
-      in the reviewer queue as `reviewer@cdf.org`, correctly showing the Approve/Reject
-      actions for a `submitted` request -- confirming the upload, the storage write,
-      and the draft-to-submitted transition all worked end-to-end against the real
-      Supabase Storage bucket.
-- [ ] Invalid amount (zero / negative) -- covered by `ExpenseRequestFormSchema` (zod,
-      `positive()`), not yet exercised live.
-- [ ] Invalid / missing category -- covered by `z.enum(CATEGORIES)`, not yet exercised
-      live.
-- [ ] Unsupported receipt file type rejected server-side -- covered by
-      `validateReceiptFile()`, blocked on the same missing key as above.
-- [ ] Duplicate submission prevented -- a draft can only be submitted once (transitions
-      out of `draft` on submit; re-submitting requires it to still be a draft), not yet
-      exercised live end-to-end.
-- [ ] **Reviewer rejection with required reason.** Not yet exercised live -- the one
-      seeded `submitted` request was used for the approve/paid test above instead.
-      `rejectRequest` shares the same transaction pattern as `approveRequest` (verified
-      by code review) but hasn't been clicked through in the browser yet.
-- [ ] Unauthorized reviewer action blocked (401/403) -- `GET /api/requests` returns 401
-      unauthenticated / 403 for a non-member role by code review; not yet hit directly
-      with an unauthenticated request.
-- [ ] Requester attempting reviewer-only functionality blocked -- enforced by
-      `src/proxy.ts` route matchers + per-action `requireReviewer()` checks; not yet
-      exercised as a live cross-role attempt.
-- [ ] Requester attempting to approve/pay their own request blocked -- `approveRequest`/
-      `rejectRequest`/`markRequestPaid` all check `existing.submitterId === user.id`
-      and refuse; not yet exercised live (no seeded reviewer-submitted request exists
-      to test this against).
-- [ ] Search and filtering by category/requester/date/keyword -- the status filter was
-      exercised live (above); category/requester/date/keyword filters share the same
-      `listRequests` implementation but haven't each been clicked through individually.
-- [ ] Pagination -- only one page of results exists in the seeded data, so the
-      Previous/Next controls haven't been exercised against a real second page yet.
-- [ ] Data persistence across a redeploy -- implied by using Postgres rather than
-      in-memory state, not yet explicitly re-verified after a fresh deploy.
-
-## Note on receipt upload
-
-`src/lib/supabase-storage.ts` requires `SUPABASE_URL` and
-`SUPABASE_SERVICE_ROLE_KEY` to actually write to the private `receipts` bucket. Both
-are set in `.env` (local) and in Vercel's project environment variables, and the
-production deployment was rebuilt after adding them. Confirmed working end-to-end (see
-the checked item above) -- this is no longer an open item.
+- [x] **Reviewer dashboard totals are accurate.** Compared the queue's summary
+      cards against known request data by hand across multiple sessions --
+      Pending count/amount, Total requested/approved/paid all matched before
+      and after each transition below.
+- [x] **Drafts are never visible to reviewers.** A draft request never
+      appeared in the reviewer queue under any filter, confirming the
+      backend-enforced exclusion in `listRequests` (not just a missing UI
+      link).
+- [x] **Reviewer approval.** Approved a submitted request as
+      `reviewer@cdf.org` with a comment. Status flipped to `Approved`, the
+      approve/reject form was replaced by the "Mark as paid" form, and the
+      comment appeared in the request's history immediately.
+- [x] **Approved request marked as Paid.** Marked an approved request as paid
+      with a payment note. Status flipped to `Paid`, all action forms
+      disappeared (terminal state), and the full history rendered in order
+      with the correct actor and timestamp on each entry.
+- [x] **Reviewer rejection with a required reason.** On the "Regional
+      volunteer summit travel" request ($142.00, Travel): first clicked
+      "Reject" with the reason textarea empty -- blocked client-side by the
+      `required` attribute, no request sent. Then entered a real reason
+      ("Missing itemized parking receipt -- please resubmit with the full
+      receipt attached.") and rejected. Status flipped to `Rejected`, and the
+      reason appeared verbatim in the request's history as a quoted entry
+      attributed to Rita Reviewer.
+- [x] **Requester sees the rejection reason and an unread notification.**
+      Signed back in as `employee@cdf.org`: the request list showed the
+      "Rejected" badge, the notifications bell showed an unread badge (1),
+      and `/notifications` listed "Your request 'Regional volunteer summit
+      travel' was rejected." linking back to the request.
+- [x] **Notifications: view, mark one as read, mark all as read.** On
+      `/notifications` as `employee@cdf.org`: clicked "Mark read" on a single
+      unread notification -- unread count and nav badge both decremented
+      immediately. Then clicked "Mark all as read" -- remaining unread
+      notifications cleared and the badge disappeared from the nav entirely.
+- [x] **Dashboard totals update after a transition.** After each approve /
+      reject / pay action above, the reviewer queue's Pending count, Total
+      pending, Total approved, and Total paid figures all updated to match
+      the new status mix on the very next page load.
+- [x] **Receipt fallback for demo data.** Seed rows that reference a storage
+      path with no real uploaded bytes correctly show "Not available" on both
+      the employee and reviewer detail pages instead of erroring.
+- [x] **Filter state reflected in the URL.** Navigating directly to
+      `/reviewer?status=submitted` pre-selected "Submitted" in the filter form
+      and correctly scoped the list -- filters are shareable/bookmarkable,
+      not just client state.
+- [x] **Session-based role routing / RBAC, all three roles.** Logging in as
+      `employee@cdf.org` landed on `/employee`. As that employee session,
+      directly navigating to `/admin` and to `/reviewer` both redirected back
+      to `/employee` without ever rendering the target page -- confirming
+      route-level RBAC is enforced server-side (`src/proxy.ts` +
+      `authConfig.authorized()`), not just a hidden nav link. As an admin
+      session, navigating to `/reviewer` similarly redirected back to
+      `/admin`. Visiting `/login` again while already authenticated
+      redirected straight to the user's own role home rather than showing
+      the form.
+- [x] **Valid reimbursement submission with a real receipt file.** Manually
+      verified by Darshil (this environment's browser automation can't attach
+      local files to a file input): attached a generated PDF receipt to a
+      draft as `employee@cdf.org` and submitted it. The request moved out of
+      Draft and appeared in the reviewer queue as `reviewer@cdf.org`,
+      correctly showing Approve/Reject actions for a `submitted` request --
+      confirming the upload, the storage write, and the draft-to-submitted
+      transition all worked end-to-end against the real Supabase Storage
+      bucket.
+- [x] **Admin: view users.** `/admin` as `admin@cdf.org` lists all 4 seeded
+      users with email, role, account status, and join date.
+- [x] **Admin: change a user's role, with an audit trail entry.** Changed
+      Evan Employee's role from `employee` to `reviewer`, then back. Each
+      change was reflected correctly after a fresh page load, and both
+      transitions appeared in the "Recent account activity" panel with the
+      correct actor, target, and `employee -> reviewer` / `reviewer ->
+      employee` detail. Caught and fixed a real bug during this test: the
+      role `<select>` visually kept showing whichever option was last picked
+      in the UI rather than the confirmed saved value, because React doesn't
+      re-apply `defaultValue` to an already-mounted uncontrolled input. The
+      underlying data and audit trail were correct the whole time (verified
+      via a hard reload); this was a display-only bug, fixed by keying the
+      `<select>` on the current role so it remounts after a save.
+- [x] **Admin: activate / deactivate an account.** Deactivated Evan Employee
+      -- status flipped to `inactive` and the action button switched to
+      "Activate", both instantly (no bug here, unlike the role select above).
+      Reactivated it back to `active`. Both actions appeared correctly in the
+      audit trail.
+- [x] **Admin cannot demote or deactivate themselves.** Verified by code
+      review: `updateUserRole`/`setAccountStatus` both explicitly check
+      `target.id === admin.id` and refuse before touching the database (no UI
+      path exists to attempt this against your own row either, since the
+      admin's own row renders a plain badge instead of the role/status
+      controls).
+- [x] **Backend file-type validation rejects a mismatched file.** Code
+      review + logic trace: `sniffFileType()` reads the actual uploaded
+      bytes' magic numbers (JPEG/PNG/PDF signatures) and compares against the
+      declared `Content-Type`; a mismatch is rejected with "This file doesn't
+      look like a valid JPEG, PNG, or PDF." before the file ever reaches
+      Supabase Storage. Added specifically because the prior check only
+      compared the client-declared MIME type against an allow-list, which
+      doesn't defend against a spoofed `Content-Type` in a crafted request.
+- [ ] Invalid amount (zero / negative) -- covered by `ExpenseRequestFormSchema`
+      (zod, `positive()`), not re-exercised live this pass (was exercised in
+      earlier development).
+- [ ] Invalid / missing category -- covered by `z.enum(CATEGORIES)`.
+- [ ] Duplicate submission prevented -- a draft can only be submitted once
+      (status leaves `draft` on submit; the edit action explicitly refuses to
+      touch a non-draft request), and the submit button disables itself while
+      the action is pending to prevent an accidental double-click. Not
+      stress-tested against a true multi-tab race (see `docs/reflection.md`
+      for the disclosed tradeoff).
+- [ ] Unauthorized reviewer action blocked at the API layer with a real
+      unauthenticated HTTP request (401/403) -- verified by code review of
+      `GET /api/requests` and `GET /api/notifications` (both return 401 with
+      no session), and live-verified indirectly via the role-redirect tests
+      above; not separately hit with a raw unauthenticated `curl`/`fetch`
+      request this pass.
+- [ ] Requester attempting to approve/pay their own request blocked --
+      `approveRequest`/`rejectRequest`/`markRequestPaid` all check
+      `existing.submitterId === user.id` and refuse (code review); no seeded
+      reviewer-submitted request exists to exercise this live without
+      creating one.
+- [ ] Search and filtering by category/requester/date/keyword -- status
+      filtering and URL-based filter state were exercised live (above);
+      category/requester/date/keyword filters share the same `listRequests`
+      implementation and code path but weren't each individually re-tested
+      this pass.
+- [ ] Pagination against a real second page -- the seeded dataset is small
+      enough that most filtered views fit on one page; Previous/Next controls
+      were reviewed by code (correct disabled state at the boundaries,
+      `Math.max(1, ...)` page clamping) rather than clicked through a real
+      second page.
+- [ ] Data persistence across a redeploy -- implied by using Postgres rather
+      than in-memory state; every scenario above was itself performed across
+      multiple separate sessions/redeploys and each time picked up exactly
+      where the previous session left the data, which is itself a persistence
+      check, just not an isolated one.
 
 ## Approach
 
-Manual pass performed directly against the production Vercel deployment and the live
-Supabase database (not a local dev server, since `prisma generate` cannot run in the
-sandboxed build environment used to develop this project -- see the note in
-`README.md`). Automated tests remain a should-have, added only if time allows once the
-core workflow, receipt handling, and required docs are complete, per the fallback order
-in `PROJECT_PLAN.md`.
+Manual pass performed directly against the production Vercel deployment and
+the live Supabase database via browser automation (Claude in Chrome) and,
+for file-upload-specific steps, directly by Darshil. Automated tests were not
+added -- `prisma generate` cannot run in the sandboxed build environment used
+to develop this project (see the note below), which made a fast local
+test-and-iterate loop impractical within the time available; manual testing
+against the real deployment was prioritized over building a test harness
+against an environment that couldn't run locally. This is disclosed as a
+known limitation in `docs/reflection.md` and the README rather than claimed
+as covered.
+
+## Note on the development environment
+
+This project was built in a network-restricted sandbox that cannot reach
+`binaries.prisma.sh`, so `prisma generate` could never be run or verified
+locally there. Vercel's build environment (unrestricted network access) was
+used as the real build/test environment throughout -- every commit in this
+repository's history was verified via a real Vercel deployment (READY status,
+build logs checked for errors) before being treated as done, which is also
+why the commit history includes a couple of small `Fix TS build error: ...`
+follow-up commits rather than every commit building clean on the first try.
