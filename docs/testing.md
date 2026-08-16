@@ -150,6 +150,34 @@ at the bottom on why.
       where the previous session left the data, which is itself a persistence
       check, just not an isolated one.
 
+## Post-launch feature additions (live-verified)
+
+Added and live-tested against production after the initial submission-ready state:
+
+- [x] **Login page UI cleanup.** Confirmed the seeded-logins hint is gone, the email
+      field shows a generic `you@example.com` placeholder, and a "Create account" link
+      is present.
+- [x] **Re-seeded demo accounts.** Confirmed via the admin Users list and by actually
+      signing in as `adam.brown@gmail.com` (admin) and the other reseeded accounts
+      that the new names/emails are live and functional -- not just displayed.
+- [x] **Self-signup end-to-end.** Submitted a real signup (Sarah Connor,
+      sarah.connor@gmail.com), watched the password strength meter update live from
+      "Very weak" to "Strong" as rule checks were satisfied, and confirmed the
+      "Account creation request has been sent to the admin..." confirmation box.
+      Logged in as admin, saw the request under the Account Requests tab (with an
+      unread-style count badge), clicked Accept, and confirmed the user count went
+      from 4 to 5 and the new user appeared in the Users tab as an active `employee`.
+      Signed in as the new account with its real password and landed on `/employee`
+      correctly.
+- [x] **Deactivated-account error message.** Deactivated the test account from admin,
+      then attempted to sign in as that account: got "Account Deactivated, Contact
+      System Admin." instead of the generic invalid-credentials message. Reactivated
+      the account afterward and confirmed normal sign-in resumed. Verified via the
+      audit trail panel that both the deactivate and reactivate actions were recorded.
+- [x] Confirmed no new Supabase security advisories beyond the existing "RLS enabled,
+      no policy" INFO-level items (expected; app-layer auth is the real boundary, not
+      Postgres RLS), and the new `account_requests` table follows the same pattern.
+
 ## Approach
 
 Manual pass performed directly against the production Vercel deployment and

@@ -47,6 +47,13 @@ with one workflow:
 - [x] `GET /api/requests` and `GET /api/notifications`: real paginated/filterable/
       sortable API endpoints, consistent response shape, 401/403/500 handled without
       leaking internal error detail
+- [x] Self-signup: a public "Create account" form (name, surname, email, password
+      with a live strength meter enforcing common password rules) creates a pending
+      request, reviewed by an admin from a dedicated Account Requests tab; accepting
+      creates a real, active `employee`-role account
+- [x] Deactivated-account logins show "Account Deactivated, Contact System Admin"
+      instead of the generic invalid-credentials message (only revealed after the
+      password is confirmed correct, so it can't be used to probe account existence)
 
 ## Tech stack
 
