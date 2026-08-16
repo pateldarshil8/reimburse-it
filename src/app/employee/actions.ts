@@ -68,7 +68,6 @@ export async function saveExpenseRequest(
   const receiptField = formData.get("receipt");
   const hasNewReceipt = receiptField instanceof File && receiptField.size > 0;
 
-  let receiptBytes: Uint8Array | null = null;
   if (hasNewReceipt) {
     const receiptError = validateReceiptFile(receiptField);
     if (receiptError) {
@@ -78,7 +77,7 @@ export async function saveExpenseRequest(
     // Backend file-type check: don't trust the client-declared MIME type
     // (File.type) or the filename extension alone -- confirm the actual
     // file bytes match a supported format (problem_statement.md §15/§18).
-    receiptBytes = new Uint8Array(await receiptField.arrayBuffer());
+    const receiptBytes = new Uint8Array(await receiptField.arrayBuffer());
     const sniffed = sniffFileType(receiptBytes);
     if (!sniffed || sniffed !== receiptField.type) {
       const error = "This file doesn't look like a valid JPEG, PNG, or PDF.";
@@ -110,10 +109,12 @@ export async function saveExpenseRequest(
     ? await prisma.expenseRequest.update({ where: { id: existing.id }, data })
     : await prisma.expenseRequest.create({ data });
 
-  if (hasNewReceipt && receiptBytes) {
+  if (hasNewReceipt) {
     try {
       const path = `${session.user.id}/${saved.id}/${Date.now()}-${receiptField.name}`;
-      await uploadReceipt(path, new Blob([receiptBytes]), receiptField.type);
+      // Upload the original File (not the sniffed byte copy) -- Files/Blobs
+      // are re-readable, so this is still the same bytes we just validated.
+      await uploadReceipt(path, receiptField, receiptField.type);
       await prisma.expenseRequest.update({
         where: { id: saved.id },
         data: {
