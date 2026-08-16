@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { loginAction } from "./actions";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export default function LoginPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="employee@cdf.org"
+                placeholder="you@example.com"
                 required
               />
             </div>
@@ -42,15 +43,19 @@ export default function LoginPage() {
               <Input id="password" name="password" type="password" required />
             </div>
             {state?.error && (
-              <p className="text-sm text-red-600">{state.error}</p>
+              <p className="text-sm text-red-600" role="alert">
+                {state.error}
+              </p>
             )}
             <Button type="submit" disabled={pending} className="w-full">
               {pending ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <p className="mt-4 text-xs text-neutral-500">
-            Seeded logins: employee@cdf.org / reviewer@cdf.org / admin@cdf.org, password:
-            password123
+          <p className="mt-4 text-center text-sm text-neutral-500">
+            New here?{" "}
+            <Link href="/signup" className="font-medium text-neutral-900 underline">
+              Create account
+            </Link>
           </p>
         </CardContent>
       </Card>
