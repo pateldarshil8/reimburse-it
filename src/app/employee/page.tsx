@@ -39,7 +39,7 @@ export default async function EmployeeDashboard({
         <Card>
           <CardContent className="py-10 text-center text-sm text-neutral-500">
             You haven&apos;t created any requests yet.{" "}
-            <Link href="/employee/new" className="underline">
+            <Link href="/employee/new" className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">
               Create your first one
             </Link>
             .
@@ -49,7 +49,7 @@ export default async function EmployeeDashboard({
         <div className="flex flex-col gap-3">
           {data.map((request) => (
             <Link key={request.id} href={`/employee/${request.id}`}>
-              <Card className="transition-colors hover:border-neutral-400">
+              <Card className="hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
                     <p className="font-medium">{request.title}</p>

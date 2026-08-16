@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Select,
   SelectContent,
@@ -151,9 +152,11 @@ export function RequestForm({ existing }: { existing?: ExistingRequest }) {
           variant="outline"
           disabled={pending}
         >
+          {pending && <Spinner className="size-4" />}
           {pending ? "Saving..." : "Save as draft"}
         </Button>
         <Button type="submit" name="intent" value="submit" disabled={pending}>
+          {pending && <Spinner className="size-4" />}
           {pending ? "Submitting..." : "Submit for review"}
         </Button>
         {existing && (

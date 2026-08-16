@@ -7,6 +7,7 @@ import {
   type AdminActionState,
 } from "./actions";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { formatDateTime } from "@/lib/format";
 
 const initialState: AdminActionState = {};
@@ -42,6 +43,7 @@ export function AccountRequestRow({ id, firstName, lastName, email, createdAt }:
         <div className="flex flex-wrap gap-2">
           <form action={approveAction}>
             <Button type="submit" size="sm" disabled={approvePending || rejectPending}>
+              {approvePending && <Spinner className="size-3.5" />}
               {approvePending ? "Accepting..." : "Accept"}
             </Button>
           </form>
@@ -52,6 +54,7 @@ export function AccountRequestRow({ id, firstName, lastName, email, createdAt }:
               variant="destructive"
               disabled={approvePending || rejectPending}
             >
+              {rejectPending && <Spinner className="size-3.5" />}
               {rejectPending ? "Rejecting..." : "Reject"}
             </Button>
           </form>

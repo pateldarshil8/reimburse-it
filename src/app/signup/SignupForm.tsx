@@ -7,6 +7,7 @@ import { getPasswordStrength } from "@/lib/password";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Card,
   CardContent,
@@ -26,18 +27,18 @@ export function SignupForm() {
 
   if (state.success) {
     return (
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm animate-fade-in">
         <CardHeader>
           <CardTitle>Request sent</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="rounded-md border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900">
             Account creation request has been sent to the admin. Your account
             will be activated once it&apos;s accepted.
           </div>
           <Link
             href="/login"
-            className="text-center text-sm font-medium text-neutral-900 underline"
+            className="text-center text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
           >
             Back to sign in
           </Link>
@@ -49,7 +50,10 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Create account</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <span className="inline-block size-2 rounded-full bg-indigo-600" aria-hidden="true" />
+          Create account
+        </CardTitle>
         <CardDescription>
           Request access to ReimburseIt. An admin reviews new accounts before
           they&apos;re activated.
@@ -98,7 +102,7 @@ export function SignupForm() {
                   {[0, 1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className={`flex-1 rounded-full transition-colors ${
+                      className={`flex-1 rounded-full transition-colors duration-300 ${
                         i < strength.score
                           ? STRENGTH_BAR_COLORS[strength.score - 1]
                           : "bg-neutral-200"
@@ -110,16 +114,16 @@ export function SignupForm() {
                   Strength: <span className="font-medium">{strength.label}</span>
                 </p>
                 <ul className="mt-1 grid grid-cols-1 gap-0.5 text-xs sm:grid-cols-2">
-                  <li className={strength.checks.length ? "text-green-600" : "text-neutral-400"}>
+                  <li className={`transition-colors duration-200 ${strength.checks.length ? "text-green-600" : "text-neutral-400"}`}>
                     {strength.checks.length ? "✓" : "•"} At least 8 characters
                   </li>
-                  <li className={strength.checks.case ? "text-green-600" : "text-neutral-400"}>
+                  <li className={`transition-colors duration-200 ${strength.checks.case ? "text-green-600" : "text-neutral-400"}`}>
                     {strength.checks.case ? "✓" : "•"} Upper &amp; lowercase letters
                   </li>
-                  <li className={strength.checks.number ? "text-green-600" : "text-neutral-400"}>
+                  <li className={`transition-colors duration-200 ${strength.checks.number ? "text-green-600" : "text-neutral-400"}`}>
                     {strength.checks.number ? "✓" : "•"} At least one number
                   </li>
-                  <li className={strength.checks.special ? "text-green-600" : "text-neutral-400"}>
+                  <li className={`transition-colors duration-200 ${strength.checks.special ? "text-green-600" : "text-neutral-400"}`}>
                     {strength.checks.special ? "✓" : "•"} A special character
                   </li>
                 </ul>
@@ -137,13 +141,14 @@ export function SignupForm() {
           )}
 
           <Button type="submit" disabled={pending} className="w-full">
+            {pending && <Spinner className="size-4" />}
             {pending ? "Submitting..." : "Request account"}
           </Button>
         </form>
 
         <p className="mt-4 text-center text-sm text-neutral-500">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">
             Sign in
           </Link>
         </p>

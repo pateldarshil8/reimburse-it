@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const initialState: ReviewActionState = {};
@@ -54,6 +55,7 @@ function SubmittedActions({ id }: { id: string }) {
             </p>
           )}
           <Button type="submit" disabled={approvePending} className="self-start">
+            {approvePending && <Spinner className="size-4" />}
             {approvePending ? "Approving..." : "Approve"}
           </Button>
         </form>
@@ -78,6 +80,7 @@ function SubmittedActions({ id }: { id: string }) {
             disabled={rejectPending}
             className="self-start"
           >
+            {rejectPending && <Spinner className="size-4" />}
             {rejectPending ? "Rejecting..." : "Reject"}
           </Button>
         </form>
@@ -112,6 +115,7 @@ function ApprovedActions({ id }: { id: string }) {
             </p>
           )}
           <Button type="submit" disabled={pending} className="self-start">
+            {pending && <Spinner className="size-4" />}
             {pending ? "Marking as paid..." : "Mark as paid"}
           </Button>
         </form>

@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { updateUserRole, setAccountStatus, type AdminActionState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { formatDate } from "@/lib/format";
 
 const initialState: AdminActionState = {};
@@ -50,13 +51,14 @@ export function UserRow({ id, name, email, role, accountStatus, createdAt, isSel
               key={role}
               name="role"
               defaultValue={role}
-              className="flex h-8 w-32 rounded-md border border-neutral-300 bg-white px-2 text-sm shadow-sm"
+              className="flex h-8 w-32 rounded-lg border border-neutral-300 bg-white px-2 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
             >
               <option value="employee">employee</option>
               <option value="reviewer">reviewer</option>
               <option value="admin">admin</option>
             </select>
             <Button type="submit" size="sm" variant="outline" disabled={rolePending}>
+              {rolePending && <Spinner className="size-3.5" />}
               {rolePending ? "Saving..." : "Update role"}
             </Button>
             {roleState.error && <p className="text-xs text-red-600">{roleState.error}</p>}
@@ -79,6 +81,7 @@ export function UserRow({ id, name, email, role, accountStatus, createdAt, isSel
               variant={accountStatus === "active" ? "destructive" : "outline"}
               disabled={statusPending}
             >
+              {statusPending && <Spinner className="size-3.5" />}
               {statusPending
                 ? "Saving..."
                 : accountStatus === "active"

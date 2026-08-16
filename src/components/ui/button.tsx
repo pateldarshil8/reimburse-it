@@ -4,21 +4,25 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]",
   {
     variants: {
       variant: {
-        default: "bg-neutral-900 text-white hover:bg-neutral-800",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
-        outline: "border border-neutral-300 bg-white hover:bg-neutral-100",
-        secondary: "bg-neutral-100 text-neutral-900 hover:bg-neutral-200",
-        ghost: "hover:bg-neutral-100",
-        link: "text-neutral-900 underline-offset-4 hover:underline",
+        default:
+          "bg-indigo-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-md",
+        destructive:
+          "bg-red-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md",
+        outline:
+          "border border-neutral-300 bg-white hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-sm",
+        secondary:
+          "bg-neutral-100 text-neutral-900 hover:-translate-y-0.5 hover:bg-neutral-200",
+        ghost: "hover:bg-indigo-50 hover:text-indigo-700",
+        link: "text-indigo-600 underline-offset-4 hover:underline hover:text-indigo-700",
       },
       size: {
         default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        sm: "h-8 rounded-lg px-3 text-xs",
+        lg: "h-10 rounded-lg px-8",
         icon: "h-9 w-9",
       },
     },

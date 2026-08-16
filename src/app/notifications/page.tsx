@@ -71,8 +71,8 @@ export default async function NotificationsPage() {
                 return (
                   <li
                     key={n.id}
-                    className={`flex items-start justify-between gap-4 rounded-md border p-3 ${
-                      n.readAt ? "border-neutral-100" : "border-neutral-300 bg-neutral-50"
+                    className={`flex items-start justify-between gap-4 rounded-lg border p-3 transition-colors duration-150 ${
+                      n.readAt ? "border-neutral-100" : "border-indigo-200 bg-indigo-50/60"
                     }`}
                   >
                     {canLink ? (

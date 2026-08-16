@@ -93,7 +93,7 @@ export default async function ReviewerQueuePage({
                 id="status"
                 name="status"
                 defaultValue={sp.status ?? ""}
-                className="flex h-9 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm shadow-sm"
+                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               >
                 <option value="">All (except drafts)</option>
                 {STATUS_OPTIONS.map((s) => (
@@ -109,7 +109,7 @@ export default async function ReviewerQueuePage({
                 id="category"
                 name="category"
                 defaultValue={sp.category ?? ""}
-                className="flex h-9 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm shadow-sm"
+                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               >
                 <option value="">All categories</option>
                 {CATEGORIES.map((c) => (
@@ -125,7 +125,7 @@ export default async function ReviewerQueuePage({
                 id="requesterId"
                 name="requesterId"
                 defaultValue={sp.requesterId ?? ""}
-                className="flex h-9 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm shadow-sm"
+                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               >
                 <option value="">All requesters</option>
                 {employees.map((e) => (
@@ -141,7 +141,7 @@ export default async function ReviewerQueuePage({
                 id="sort"
                 name="sort"
                 defaultValue={sp.sort ?? "newest"}
-                className="flex h-9 w-full rounded-md border border-neutral-300 bg-white px-3 text-sm shadow-sm"
+                className="flex h-9 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm shadow-sm transition-colors duration-150 hover:border-neutral-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30"
               >
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
@@ -177,7 +177,7 @@ export default async function ReviewerQueuePage({
         <div className="flex flex-col gap-3">
           {data.map((request) => (
             <Link key={request.id} href={`/reviewer/${request.id}`}>
-              <Card className="transition-colors hover:border-neutral-400">
+              <Card className="hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
                     <p className="font-medium">{request.title}</p>

@@ -25,7 +25,7 @@ export function ReviewHistory({ actions }: { actions: ReviewActionEntry[] }) {
   return (
     <ol className="flex flex-col gap-4">
       {actions.map((entry) => (
-        <li key={entry.id} className="border-l-2 border-neutral-200 pl-4">
+        <li key={entry.id} className="border-l-2 border-indigo-100 pl-4">
           <div className="flex flex-wrap items-baseline gap-x-2 text-sm">
             <span className="font-medium">
               {ACTION_LABEL[entry.action] ?? entry.action}

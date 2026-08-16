@@ -69,7 +69,7 @@ export default async function ReviewerRequestDetailPage({
                   href={receiptSignedUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-neutral-900 underline"
+                  className="font-medium text-indigo-600 hover:text-indigo-700 hover:underline"
                 >
                   View receipt
                 </a>
