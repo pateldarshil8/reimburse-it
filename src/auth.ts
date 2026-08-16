@@ -1,8 +1,16 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { authConfig } from "@/auth.config";
 import { prisma } from "@/lib/prisma";
+
+// Thrown instead of returning null so loginAction (src/app/login/actions.ts)
+// can show "Account Deactivated, Contact System Admin" instead of the
+// generic "Invalid email or password" -- distinguished from other
+// authorize() failures via `code`, checked in the catch block there.
+export class AccountDeactivatedError extends CredentialsSignin {
+  code = "account_deactivated";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -25,8 +33,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!valid) return null;
 
         // Deactivated accounts (admin-managed, see /admin) can't sign in,
-        // even with a correct password.
-        if (user.accountStatus !== "active") return null;
+        // even with a correct password. Checked only after the password is
+        // confirmed correct, so a wrong-password guess never reveals
+        // whether a given account exists/is deactivated.
+        if (user.accountStatus !== "active") {
+          throw new AccountDeactivatedError();
+        }
 
         return {
           id: user.id,
