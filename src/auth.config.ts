@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 
 export type AppRole = "employee" | "reviewer" | "admin";
 
-const ROLE_HOME: Record<AppRole, string> = {
+export const ROLE_HOME: Record<AppRole, string> = {
   employee: "/employee",
   reviewer: "/reviewer",
   admin: "/admin",
