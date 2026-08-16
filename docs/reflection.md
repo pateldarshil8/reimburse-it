@@ -86,6 +86,65 @@ across. Both contain the same underlying feature set by the end.
   additional admin surface (e.g. a dedicated full-history page per user)
   beyond that.
 
+## Problems encountered and fixed
+
+Real bugs found during development and post-launch testing, not just disclosed
+scope cuts (those are in "Key tradeoffs" above):
+
+- **Admin role `<select>` showed a stale value after a successful update
+  (Day 3).** Changing a user's role saved correctly (confirmed via a hard
+  reload and the audit trail), but the dropdown kept displaying whichever
+  option the admin had last picked in the UI rather than the saved value --
+  React doesn't re-apply `defaultValue` to an already-mounted uncontrolled
+  `<select>`. Fixed by keying the element on the current role
+  (`key={role}`) so it remounts, and re-reads the fresh `defaultValue`,
+  whenever the server-fetched role changes.
+- **Receipt file-type validation trusted the client-declared MIME type
+  (Day 3 security review).** The upload check only compared `File.type`
+  (attacker-controllable in a crafted request) against an allow-list.
+  Fixed by sniffing the actual uploaded bytes' magic numbers
+  (`src/lib/file-signature.ts`) and rejecting a mismatch before the file
+  ever reaches Supabase Storage.
+- **Reported: "Invalid email or password" right after an admin changes a
+  user's role (post-launch).** Investigated by reproducing the reported
+  sequence two independent ways -- once through the actual admin UI
+  (change a role, sign out, sign back in as that user) and once by
+  updating the role directly in the database to rule out any UI/timing
+  involvement -- and in both cases the login succeeded normally with the
+  new role and correct account layout. Could not reproduce a broken
+  login. In the process of investigating, found and fixed two real,
+  related issues instead of the literal report:
+  - `authorize()` did an exact-match email lookup; the submitted email
+    wasn't lowercased/trimmed the way signup already stores it, so an
+    email typed with different casing than it was saved with (e.g.
+    autocapitalized by a phone keyboard) would fail the lookup and show
+    the same generic "Invalid email or password" message. Fixed in
+    `src/auth.ts`.
+  - An already-signed-in user's role was cached in their JWT at login
+    time and never refreshed, so an admin changing that user's role had
+    no visible effect until they manually signed out and back in --
+    Server Components and Server Actions (which decide page content and
+    admin/reviewer permissions) kept trusting the stale role for the
+    rest of the session. Fixed with a Node-side `session` callback
+    override in `src/auth.ts` that re-reads the current role from the
+    database on every session read, plus each role-scoped layout
+    (`src/app/{employee,reviewer,admin}/layout.tsx`) now re-checking
+    `session.user.role` at render time and redirecting to the user's
+    real current section if it no longer matches -- since the edge
+    middleware (`src/proxy.ts`) still gates on the JWT's cached role
+    (Prisma/pg can't run in the edge runtime) and can lag behind a role
+    change until the next login. Verified live: changed a test account's
+    role directly in the database while it was already signed in, then
+    navigated without signing out -- it was redirected to the correct
+    new section immediately, nav badge and all.
+  - Given the very live, shared nature of testing this against production
+    with a single shared admin login, it's also plausible the original
+    report was affected by two people (me and the reporter) exercising
+    role changes on the same accounts around the same time, which can
+    look like unexpected behavior even when each individual change is
+    working correctly -- noted here for completeness rather than as a
+    confirmed root cause.
+
 ## AI tools and external resources used
 
 This project was built with Claude (Anthropic) as a development assistant

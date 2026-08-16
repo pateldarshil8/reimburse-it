@@ -178,6 +178,23 @@ Added and live-tested against production after the initial submission-ready stat
       no policy" INFO-level items (expected; app-layer auth is the real boundary, not
       Postgres RLS), and the new `account_requests` table follows the same pattern.
 
+## Post-launch bug fix (live-verified)
+
+- [x] **Stale role after an admin role change.** Reported as "logging into a
+      user's account shows Invalid email or password after their role is
+      changed." Reproduced the reported sequence two ways -- through the admin
+      UI and by updating the role directly in the database -- and in both
+      cases login succeeded normally with the new role; could not reproduce a
+      broken login. Fixed two real related issues found during the
+      investigation instead (case-sensitive email lookup at login, and an
+      already-signed-in session not picking up a role change until re-login)
+      -- see `docs/reflection.md` -> "Problems encountered and fixed" for the
+      full writeup. Verified live: created a temporary test account, signed
+      in, changed its role directly in the database without signing out, then
+      navigated to its old section's URL -- redirected immediately to the
+      correct new section with the nav badge showing the updated role, no
+      re-login required. Cleaned up the temporary account afterward.
+
 ## Approach
 
 Manual pass performed directly against the production Vercel deployment and
