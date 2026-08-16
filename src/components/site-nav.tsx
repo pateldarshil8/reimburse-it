@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { unreadNotificationCount } from "@/lib/notifications";
 
 const NAV_LINKS: Record<string, { href: string; label: string }> = {
   employee: { href: "/employee", label: "My requests" },
@@ -13,6 +14,9 @@ export async function SiteNav() {
   const session = await auth();
   const role = session?.user?.role;
   const link = role ? NAV_LINKS[role] : undefined;
+  const unreadCount = session?.user
+    ? await unreadNotificationCount(session.user.id)
+    : 0;
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -32,6 +36,17 @@ export async function SiteNav() {
         <div className="flex items-center gap-3">
           {session?.user && (
             <>
+              <Link
+                href="/notifications"
+                className="relative text-sm text-neutral-600 hover:text-neutral-900"
+              >
+                Notifications
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="ml-1.5">
+                    {unreadCount}
+                  </Badge>
+                )}
+              </Link>
               <Badge variant="secondary">{session.user.role}</Badge>
               <span className="text-sm text-neutral-600">
                 {session.user.name}
