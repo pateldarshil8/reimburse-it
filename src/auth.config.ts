@@ -56,7 +56,7 @@ export const authConfig = {
         return true;
       }
 
-      if (isLoggedIn && nextUrl.pathname === "/login") {
+      if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/signup")) {
         return Response.redirect(
           new URL(role ? ROLE_HOME[role] : "/employee", nextUrl)
         );
