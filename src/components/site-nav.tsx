@@ -20,7 +20,7 @@ export async function SiteNav() {
 
   return (
     <header className="border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <Link href="/" className="text-sm font-semibold">
             ReimburseIt
@@ -33,7 +33,7 @@ export async function SiteNav() {
             </nav>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           {session?.user && (
             <>
               <Link
@@ -48,7 +48,7 @@ export async function SiteNav() {
                 )}
               </Link>
               <Badge variant="secondary">{session.user.role}</Badge>
-              <span className="text-sm text-neutral-600">
+              <span className="hidden text-sm text-neutral-600 sm:inline">
                 {session.user.name}
               </span>
               <form
